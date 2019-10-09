@@ -12,7 +12,7 @@ var serverCmd = &cobra.Command{
 		// Nothing
 	},
 	Run: func(cmd *cobra.Command, args []string) {
-		// Handling authenticate middleware.
+		// Run Gateway API task
 		Server()
 	},
 }
@@ -21,6 +21,7 @@ func init() {
 	rootCmd.AddCommand(serverCmd)
 }
 
+// Server returns API object
 func Server() {
 	api := router.New()
 	api.Run(":8080")

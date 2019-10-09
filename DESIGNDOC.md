@@ -10,7 +10,3 @@ Arc is a location-based P2P framework to isolate the business logic about the so
 So, we developed this framework: Arc, and packaged for Kubernetes.
 
 ## High Level Architecture
-
-### Gateway API
-
-### Geo Memcache

@@ -1,0 +1,15 @@
+version: '3'
+services:
+  meta-redis:
+    image: "redis:latest"
+    ports:
+      - "6379:6379"
+    volumes:
+      - "./data/reis:/data"
+  tracker-redis:
+    image: "redis:latest"
+    ports:
+      - "16379:6379"
+    volumes:
+      - "./data/reis:/data"
+      

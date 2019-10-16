@@ -1,0 +1,26 @@
+@startuml 
+
+participant "Peer" as peer
+participant "STUN Server" as stun
+
+participant "Gateway API" as gateway
+
+box "Container" #LightBlue
+    participant "Metadata API" as metadata
+    participant "Metadata DB" as metadb
+end box
+
+box "Container" #LightBlue
+    participant "Tracker API" as tracker
+    participant "Tracker DB" as trackerdb
+end box
+
+activate peer
+peer -> gateway: ID, LI
+activate gateway
+gateway -> tracker: ID, LI
+activate tracker
+tracker -> trackerdb: H3 Hash, LI
+activate trackerdb
+trackerdb -> trackerdb: Update LI
+@enduml

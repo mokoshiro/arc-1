@@ -1,0 +1,40 @@
+@startuml 
+
+participant "Peer" as peer
+participant "STUN Server" as stun
+
+participant "Gateway API" as gateway
+
+box "Container" #LightBlue
+    participant "Metadata API" as metadata
+    participant "Metadata DB" as metadb
+end box
+
+box "Container" #LightBlue
+    participant "Tracker API" as tracker
+    participant "Tracker DB" as trackerdb
+end box
+
+activate peer
+peer -> gateway: ID, LI, Radius
+activate gateway
+gateway -> tracker: Convert LI to H3 Hash
+activate tracker
+tracker -> trackerdb: Request(H3 Hash, LI, Radius)
+activate trackerdb
+trackerdb -> trackerdb: Extract peer ID, LI
+trackerdb --> tracker: peer ID, LI
+deactivate trackerdb
+tracker --> gateway: peer ID, LI
+deactivate tracker
+gateway -> metadata: peer ID, LI list
+activate metadata
+metadata -> metadb: peer ID list
+activate metadb
+metadb -> metadb: Extract peer IP and Port number list
+metadb --> metadata: IP and port number list
+deactivate metadb
+metadata --> gateway: Combine response <IP, Port, ID, LI>
+deactivate metadata
+gateway --> peer: Combine response
+@enduml

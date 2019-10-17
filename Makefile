@@ -26,6 +26,11 @@ dep:
 gazelle:
 	bazel run //:gazelle
 
+
+.PHONY: expose-generated-go
+expose-generated-go:
+	./hack/expose-generated-go.sh Bo0km4n arc
+
 .PHONY: clean
 clean:
 	bazel clean

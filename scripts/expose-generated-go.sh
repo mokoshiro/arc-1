@@ -28,7 +28,7 @@ expose_package () {
 	# Compute the relative_path from this package to the bazel-bin
 	local count_paths="$(echo -n "${package}" | tr '/' '\n' | wc -l)"
 	local relative_path=""
-	for i in $(seq 1 ${count_paths}); do
+	for i in $(seq 0 ${count_paths}); do
 		relative_path="../${relative_path}"
 	done
 

@@ -47,8 +47,6 @@ expose_package () {
 			found=1
 			local base=${f##*/}
 			echo "Adding a new link: ${package}/${base}"
-			echo "========= ${f}"
-			echo "========= ${relative_path}${f}"
 			ln -nsf "${relative_path}${f}" "${package}/"
 			if [[ ${base} == *.pb.validate.go ]]; then
 				echo "# gazelle:exclude ${package}/${base}" >> ${ROOT}/BUILD.bazel

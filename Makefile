@@ -29,7 +29,11 @@ gazelle:
 
 .PHONY: expose-generated-go
 expose-generated-go:
-	./hack/expose-generated-go.sh Bo0km4n arc
+	./scripts/expose-generated-go.sh Bo0km4n arc
+
+.PHONY: unlink-pb
+unlink-pb:
+	./scripts/unlink-pb-go.sh
 
 .PHONY: clean
 clean:

@@ -159,8 +159,8 @@ go_repository(
 
 go_repository(
     name = "com_github_gin_contrib_sse",
+    commit = "5545eab6dad3",
     importpath = "github.com/gin-contrib/sse",
-    tag = "v0.1.0",
 )
 
 go_repository(
@@ -196,7 +196,7 @@ go_repository(
 go_repository(
     name = "com_github_json_iterator_go",
     importpath = "github.com/json-iterator/go",
-    tag = "v1.1.7",
+    tag = "v1.1.6",
 )
 
 go_repository(
@@ -226,7 +226,7 @@ go_repository(
 go_repository(
     name = "com_github_mattn_go_isatty",
     importpath = "github.com/mattn/go-isatty",
-    tag = "v0.0.9",
+    tag = "v0.0.7",
 )
 
 go_repository(
@@ -322,13 +322,13 @@ go_repository(
 go_repository(
     name = "com_github_ugorji_go",
     importpath = "github.com/ugorji/go",
-    tag = "v1.1.7",
+    tag = "v1.1.4",
 )
 
 go_repository(
     name = "com_github_ugorji_go_codec",
+    commit = "d75b2dcb6bc8",
     importpath = "github.com/ugorji/go/codec",
-    tag = "v1.1.7",
 )
 
 go_repository(
@@ -339,7 +339,7 @@ go_repository(
 
 go_repository(
     name = "in_gopkg_check_v1",
-    commit = "41f04d3bba15",
+    commit = "20d25e280405",
     importpath = "gopkg.in/check.v1",
 )
 
@@ -358,24 +358,24 @@ go_repository(
 go_repository(
     name = "in_gopkg_yaml_v2",
     importpath = "gopkg.in/yaml.v2",
-    tag = "v2.2.4",
+    tag = "v2.2.2",
 )
 
 go_repository(
     name = "org_golang_x_crypto",
-    commit = "f99c8df09eb5",
+    commit = "c2843e01d9a2",
     importpath = "golang.org/x/crypto",
 )
 
 go_repository(
     name = "org_golang_x_net",
-    commit = "72f939374954",
+    commit = "3b0461eec859",
     importpath = "golang.org/x/net",
 )
 
 go_repository(
     name = "org_golang_x_sys",
-    commit = "ef33b2fb2c41",
+    commit = "3ef323f4f1fd",
     importpath = "golang.org/x/sys",
 )
 
@@ -502,7 +502,7 @@ go_repository(
 go_repository(
     name = "com_github_golang_mock",
     importpath = "github.com/golang/mock",
-    tag = "v1.3.1",
+    tag = "v1.1.1",
 )
 
 go_repository(
@@ -712,7 +712,7 @@ go_repository(
 go_repository(
     name = "com_google_cloud_go",
     importpath = "cloud.google.com/go",
-    tag = "v0.43.0",
+    tag = "v0.26.0",
 )
 
 go_repository(
@@ -766,7 +766,7 @@ go_repository(
 go_repository(
     name = "org_golang_google_appengine",
     importpath = "google.golang.org/appengine",
-    tag = "v1.6.1",
+    tag = "v1.4.0",
 )
 
 go_repository(
@@ -777,7 +777,7 @@ go_repository(
 
 go_repository(
     name = "org_golang_x_exp",
-    commit = "efd6b22b2522",
+    commit = "509febef88a4",
     importpath = "golang.org/x/exp",
 )
 
@@ -789,7 +789,7 @@ go_repository(
 
 go_repository(
     name = "org_golang_x_lint",
-    commit = "959b441ac422",
+    commit = "d0100b6bd8b3",
     importpath = "golang.org/x/lint",
 )
 
@@ -801,7 +801,7 @@ go_repository(
 
 go_repository(
     name = "org_golang_x_oauth2",
-    commit = "0f29369cfe45",
+    commit = "d2e6202438be",
     importpath = "golang.org/x/oauth2",
 )
 
@@ -819,7 +819,7 @@ go_repository(
 
 go_repository(
     name = "org_golang_x_tools",
-    commit = "6cdbf07be9d0",
+    commit = "2c0ae7006135",
     importpath = "golang.org/x/tools",
 )
 
@@ -839,4 +839,10 @@ go_repository(
     name = "org_uber_go_zap",
     importpath = "go.uber.org/zap",
     tag = "v1.10.0",
+)
+
+go_repository(
+    name = "org_golang_x_xerrors",
+    commit = "1b5146add898",
+    importpath = "golang.org/x/xerrors",
 )

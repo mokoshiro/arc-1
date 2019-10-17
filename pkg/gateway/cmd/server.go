@@ -39,4 +39,5 @@ func Server() {
 		log.Fatal(err)
 	}
 	api.Run(":8080")
+	defer api.Close()
 }

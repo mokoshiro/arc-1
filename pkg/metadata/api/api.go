@@ -21,7 +21,10 @@ func NewMetadataAPI(ruc usecase.RegisterUsecase) *metadataAPI {
 }
 
 func (api *metadataAPI) Register(ctx context.Context, req *proto.RegisterRequest) (*proto.RegisterResponse, error) {
-	return nil, nil
+	if err := api.registerUC.Register(req.Id, req.Addr); err != nil {
+		return nil, err
+	}
+	return &proto.RegisterResponse{}, nil
 }
 
 func (api *metadataAPI) Embed(server *grpc.Server, logger *zap.Logger) {

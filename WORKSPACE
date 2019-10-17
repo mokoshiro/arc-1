@@ -32,7 +32,7 @@ load(
 go_repository(
     name = "org_golang_google_grpc",
     importpath = "google.golang.org/grpc",
-    tag = "v1.23.0",
+    tag = "v1.24.0",
 )
 
 load(
@@ -310,7 +310,7 @@ go_repository(
 go_repository(
     name = "com_github_stretchr_objx",
     importpath = "github.com/stretchr/objx",
-    tag = "v0.1.0",
+    tag = "v0.1.1",
 )
 
 go_repository(
@@ -363,7 +363,7 @@ go_repository(
 
 go_repository(
     name = "org_golang_x_crypto",
-    commit = "c2843e01d9a2",
+    commit = "f99c8df09eb5",
     importpath = "golang.org/x/crypto",
 )
 
@@ -382,5 +382,461 @@ go_repository(
 go_repository(
     name = "org_golang_x_text",
     importpath = "golang.org/x/text",
+    tag = "v0.3.2",
+)
+
+go_repository(
+    name = "co_honnef_go_tools",
+    commit = "ea95bdfd59fc",
+    importpath = "honnef.co/go/tools",
+)
+
+go_repository(
+    name = "com_github_alicebob_gopher_json",
+    commit = "5a6b3ba71ee6",
+    importpath = "github.com/alicebob/gopher-json",
+)
+
+go_repository(
+    name = "com_github_alicebob_miniredis_v2",
+    importpath = "github.com/alicebob/miniredis/v2",
+    tag = "v2.9.0",
+)
+
+go_repository(
+    name = "com_github_apmckinlay_gsuneido",
+    commit = "1f10244968e3",
+    importpath = "github.com/apmckinlay/gsuneido",
+)
+
+go_repository(
+    name = "com_github_aws_aws_sdk_go",
+    importpath = "github.com/aws/aws-sdk-go",
+    tag = "v1.21.8",
+)
+
+go_repository(
+    name = "com_github_burntsushi_xgb",
+    commit = "27f122750802",
+    importpath = "github.com/BurntSushi/xgb",
+)
+
+go_repository(
+    name = "com_github_chzyer_logex",
+    importpath = "github.com/chzyer/logex",
+    tag = "v1.1.10",
+)
+
+go_repository(
+    name = "com_github_chzyer_readline",
+    commit = "2972be24d48e",
+    importpath = "github.com/chzyer/readline",
+)
+
+go_repository(
+    name = "com_github_chzyer_test",
+    commit = "a1ea475d72b1",
+    importpath = "github.com/chzyer/test",
+)
+
+go_repository(
+    name = "com_github_client9_misspell",
+    importpath = "github.com/client9/misspell",
+    tag = "v0.3.4",
+)
+
+go_repository(
+    name = "com_github_cockroachdb_apd",
+    importpath = "github.com/cockroachdb/apd",
+    tag = "v1.1.0",
+)
+
+go_repository(
+    name = "com_github_data_dog_go_sqlmock",
+    importpath = "github.com/DATA-DOG/go-sqlmock",
+    tag = "v1.3.3",
+)
+
+go_repository(
+    name = "com_github_davidbyttow_govips",
+    commit = "d272f04c0fea",
+    importpath = "github.com/davidbyttow/govips",
+)
+
+go_repository(
+    name = "com_github_ericlagergren_decimal",
+    commit = "73749d4874d5",
+    importpath = "github.com/ericlagergren/decimal",
+)
+
+go_repository(
+    name = "com_github_go_redsync_redsync",
+    importpath = "github.com/go-redsync/redsync",
+    tag = "v1.3.0",
+)
+
+go_repository(
+    name = "com_github_gofrs_uuid",
+    importpath = "github.com/gofrs/uuid",
+    tag = "v3.2.0",
+)
+
+go_repository(
+    name = "com_github_gogo_protobuf",
+    importpath = "github.com/gogo/protobuf",
+    tag = "v1.2.1",
+)
+
+go_repository(
+    name = "com_github_golang_glog",
+    commit = "23def4e6c14b",
+    importpath = "github.com/golang/glog",
+)
+
+go_repository(
+    name = "com_github_golang_groupcache",
+    commit = "869f871628b6",
+    importpath = "github.com/golang/groupcache",
+)
+
+go_repository(
+    name = "com_github_golang_mock",
+    importpath = "github.com/golang/mock",
+    tag = "v1.3.1",
+)
+
+go_repository(
+    name = "com_github_gomodule_redigo",
+    importpath = "github.com/gomodule/redigo",
+    tag = "v2.0.0",
+)
+
+go_repository(
+    name = "com_github_google_btree",
+    importpath = "github.com/google/btree",
+    tag = "v1.0.0",
+)
+
+go_repository(
+    name = "com_github_google_go_cmp",
+    importpath = "github.com/google/go-cmp",
     tag = "v0.3.0",
+)
+
+go_repository(
+    name = "com_github_google_go_github_v27",
+    importpath = "github.com/google/go-github/v27",
+    tag = "v27.0.4",
+)
+
+go_repository(
+    name = "com_github_google_go_querystring",
+    importpath = "github.com/google/go-querystring",
+    tag = "v1.0.0",
+)
+
+go_repository(
+    name = "com_github_google_martian",
+    importpath = "github.com/google/martian",
+    tag = "v2.1.0",
+)
+
+go_repository(
+    name = "com_github_google_pprof",
+    commit = "54271f7e092f",
+    importpath = "github.com/google/pprof",
+)
+
+go_repository(
+    name = "com_github_google_uuid",
+    importpath = "github.com/google/uuid",
+    tag = "v1.1.1",
+)
+
+go_repository(
+    name = "com_github_googleapis_gax_go_v2",
+    importpath = "github.com/googleapis/gax-go/v2",
+    tag = "v2.0.5",
+)
+
+go_repository(
+    name = "com_github_grpc_ecosystem_go_grpc_middleware",
+    importpath = "github.com/grpc-ecosystem/go-grpc-middleware",
+    tag = "v1.1.0",
+)
+
+go_repository(
+    name = "com_github_hashicorp_golang_lru",
+    importpath = "github.com/hashicorp/golang-lru",
+    tag = "v0.5.1",
+)
+
+go_repository(
+    name = "com_github_hayabusa_havana",
+    importpath = "github.com/hayabusa/havana",
+    tag = "v0.0.9",
+)
+
+go_repository(
+    name = "com_github_jeffail_gabs",
+    importpath = "github.com/Jeffail/gabs",
+    tag = "v1.4.0",
+)
+
+go_repository(
+    name = "com_github_jmespath_go_jmespath",
+    commit = "c2b33e8439af",
+    importpath = "github.com/jmespath/go-jmespath",
+)
+
+go_repository(
+    name = "com_github_jstemmer_go_junit_report",
+    commit = "af01ea7f8024",
+    importpath = "github.com/jstemmer/go-junit-report",
+)
+
+go_repository(
+    name = "com_github_kisielk_errcheck",
+    importpath = "github.com/kisielk/errcheck",
+    tag = "v1.1.0",
+)
+
+go_repository(
+    name = "com_github_kisielk_gotool",
+    importpath = "github.com/kisielk/gotool",
+    tag = "v1.0.0",
+)
+
+go_repository(
+    name = "com_github_knetic_govaluate",
+    importpath = "github.com/Knetic/govaluate",
+    tag = "v3.0.0",
+)
+
+go_repository(
+    name = "com_github_konsorten_go_windows_terminal_sequences",
+    importpath = "github.com/konsorten/go-windows-terminal-sequences",
+    tag = "v1.0.1",
+)
+
+go_repository(
+    name = "com_github_lib_pq",
+    importpath = "github.com/lib/pq",
+    tag = "v1.2.0",
+)
+
+go_repository(
+    name = "com_github_lukechampine_freeze",
+    commit = "f514e08ae5a0",
+    importpath = "github.com/lukechampine/freeze",
+)
+
+go_repository(
+    name = "com_github_mattn_go_scan",
+    commit = "c32d62d79baf",
+    importpath = "github.com/mattn/go-scan",
+)
+
+go_repository(
+    name = "com_github_opentracing_opentracing_go",
+    importpath = "github.com/opentracing/opentracing-go",
+    tag = "v1.1.0",
+)
+
+go_repository(
+    name = "com_github_pkg_errors",
+    importpath = "github.com/pkg/errors",
+    tag = "v0.8.1",
+)
+
+go_repository(
+    name = "com_github_rs_xid",
+    importpath = "github.com/rs/xid",
+    tag = "v1.2.1",
+)
+
+go_repository(
+    name = "com_github_rwcarlsen_goexif",
+    commit = "9e8deecbddbd",
+    importpath = "github.com/rwcarlsen/goexif",
+)
+
+go_repository(
+    name = "com_github_shopspring_decimal",
+    commit = "cd690d0c9e24",
+    importpath = "github.com/shopspring/decimal",
+)
+
+go_repository(
+    name = "com_github_sirupsen_logrus",
+    importpath = "github.com/sirupsen/logrus",
+    tag = "v1.4.2",
+)
+
+go_repository(
+    name = "com_github_stvp_tempredis",
+    commit = "b82af8480203",
+    importpath = "github.com/stvp/tempredis",
+)
+
+go_repository(
+    name = "com_github_ua_parser_uap_go",
+    commit = "ac4b80194e5b",
+    importpath = "github.com/ua-parser/uap-go",
+)
+
+go_repository(
+    name = "com_github_volatiletech_inflect",
+    commit = "e7201282ae8d",
+    importpath = "github.com/volatiletech/inflect",
+)
+
+go_repository(
+    name = "com_github_volatiletech_null",
+    importpath = "github.com/volatiletech/null",
+    tag = "v8.0.0",
+)
+
+go_repository(
+    name = "com_github_volatiletech_sqlboiler",
+    importpath = "github.com/volatiletech/sqlboiler",
+    tag = "v3.4.0",
+)
+
+go_repository(
+    name = "com_github_yuin_gopher_lua",
+    commit = "1cd887cd7036",
+    importpath = "github.com/yuin/gopher-lua",
+)
+
+go_repository(
+    name = "com_google_cloud_go",
+    importpath = "cloud.google.com/go",
+    tag = "v0.43.0",
+)
+
+go_repository(
+    name = "in_gopkg_go_playground_colors_v1",
+    importpath = "gopkg.in/go-playground/colors.v1",
+    tag = "v1.2.0",
+)
+
+go_repository(
+    name = "in_gopkg_gographics_imagick_v3",
+    importpath = "gopkg.in/gographics/imagick.v3",
+    tag = "v3.2.0",
+)
+
+go_repository(
+    name = "in_gopkg_h2non_bimg_v1",
+    importpath = "gopkg.in/h2non/bimg.v1",
+    tag = "v1.0.19",
+)
+
+go_repository(
+    name = "in_gopkg_inf_v0",
+    importpath = "gopkg.in/inf.v0",
+    tag = "v0.9.1",
+)
+
+go_repository(
+    name = "io_opencensus_go",
+    importpath = "go.opencensus.io",
+    tag = "v0.22.1",
+)
+
+go_repository(
+    name = "io_rsc_binaryregexp",
+    importpath = "rsc.io/binaryregexp",
+    tag = "v0.2.0",
+)
+
+go_repository(
+    name = "org_go4",
+    commit = "94abd6928b1d",
+    importpath = "go4.org",
+)
+
+go_repository(
+    name = "org_golang_google_api",
+    importpath = "google.golang.org/api",
+    tag = "v0.7.0",
+)
+
+go_repository(
+    name = "org_golang_google_appengine",
+    importpath = "google.golang.org/appengine",
+    tag = "v1.6.1",
+)
+
+go_repository(
+    name = "org_golang_google_genproto",
+    commit = "24fa4b261c55",
+    importpath = "google.golang.org/genproto",
+)
+
+go_repository(
+    name = "org_golang_x_exp",
+    commit = "efd6b22b2522",
+    importpath = "golang.org/x/exp",
+)
+
+go_repository(
+    name = "org_golang_x_image",
+    commit = "1bd0cf576493",
+    importpath = "golang.org/x/image",
+)
+
+go_repository(
+    name = "org_golang_x_lint",
+    commit = "959b441ac422",
+    importpath = "golang.org/x/lint",
+)
+
+go_repository(
+    name = "org_golang_x_mobile",
+    commit = "d3739f865fa6",
+    importpath = "golang.org/x/mobile",
+)
+
+go_repository(
+    name = "org_golang_x_oauth2",
+    commit = "0f29369cfe45",
+    importpath = "golang.org/x/oauth2",
+)
+
+go_repository(
+    name = "org_golang_x_sync",
+    commit = "112230192c58",
+    importpath = "golang.org/x/sync",
+)
+
+go_repository(
+    name = "org_golang_x_time",
+    commit = "9d24e82272b4",
+    importpath = "golang.org/x/time",
+)
+
+go_repository(
+    name = "org_golang_x_tools",
+    commit = "6cdbf07be9d0",
+    importpath = "golang.org/x/tools",
+)
+
+go_repository(
+    name = "org_uber_go_atomic",
+    importpath = "go.uber.org/atomic",
+    tag = "v1.4.0",
+)
+
+go_repository(
+    name = "org_uber_go_multierr",
+    importpath = "go.uber.org/multierr",
+    tag = "v1.1.0",
+)
+
+go_repository(
+    name = "org_uber_go_zap",
+    importpath = "go.uber.org/zap",
+    tag = "v1.10.0",
 )

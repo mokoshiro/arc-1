@@ -9,12 +9,12 @@ go_library(
     importpath = "github.com/Bo0km4n/arc/pkg/metadata/cmd",
     visibility = ["//visibility:public"],
     deps = [
+        "//internal/rpc:go_default_library",
         "//pkg/metadata/api:go_default_library",
         "//pkg/metadata/cmd/option:go_default_library",
         "//pkg/metadata/domain/repository:go_default_library",
         "//pkg/metadata/infra/db:go_default_library",
         "//pkg/metadata/usecase:go_default_library",
-        "//pkg/rpc:go_default_library",
         "@com_github_spf13_cobra//:go_default_library",
     ],
 )

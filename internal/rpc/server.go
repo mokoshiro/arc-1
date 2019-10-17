@@ -11,7 +11,7 @@ import (
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/reflection"
 
-	"github.com/Bo0km4n/arc/pkg/rpc/interceptor"
+	"github.com/Bo0km4n/arc/internal/rpc/interceptor"
 )
 
 type Service interface {

@@ -6,7 +6,7 @@ go_library(
         "logger.go",
         "validator.go",
     ],
-    importpath = "github.com/Bo0km4n/arc/pkg/rpc/interceptor",
+    importpath = "github.com/Bo0km4n/arc/internal/rpc/interceptor",
     visibility = ["//visibility:public"],
     deps = [
         "@org_golang_google_grpc//:go_default_library",

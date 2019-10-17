@@ -10,11 +10,11 @@ endif
 
 .PHONY: build
 build:
-	bazel ${BZFLAGS} build -k -- //pkg/...
+	bazel ${BZFLAGS} build -k -- //internal/... //pkg/...
 
 .PHONY: test
 test:
-	bazel ${BZFLAGS} test -- //pkg/...
+	bazel ${BZFLAGS} test -- //internal/... //pkg/...
 
 .PHONY: dep
 dep:

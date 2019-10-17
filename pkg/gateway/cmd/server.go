@@ -1,6 +1,7 @@
 package cmd
 
 import (
+	"github.com/Bo0km4n/arc/pkg/gateway/cmd/option"
 	"github.com/Bo0km4n/arc/pkg/gateway/router"
 	"github.com/spf13/cobra"
 )
@@ -19,6 +20,7 @@ var serverCmd = &cobra.Command{
 
 func init() {
 	rootCmd.AddCommand(serverCmd)
+	serverCmd.Flags().StringVarP(&option.Opt.MetadataHost, "metadata_host", "", "127.0.0.1:50051", "metadata host address")
 }
 
 // Server returns API object

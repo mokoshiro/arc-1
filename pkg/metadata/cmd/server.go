@@ -3,12 +3,12 @@ package cmd
 import (
 	"context"
 
+	"github.com/Bo0km4n/arc/internal/rpc"
 	"github.com/Bo0km4n/arc/pkg/metadata/api"
 	"github.com/Bo0km4n/arc/pkg/metadata/cmd/option"
 	"github.com/Bo0km4n/arc/pkg/metadata/domain/repository"
 	"github.com/Bo0km4n/arc/pkg/metadata/infra/db"
 	"github.com/Bo0km4n/arc/pkg/metadata/usecase"
-	"github.com/Bo0km4n/arc/pkg/rpc"
 	"github.com/spf13/cobra"
 )
 

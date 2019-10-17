@@ -1,0 +1,15 @@
+syntax = "proto3";
+
+package proto;
+
+service Metadata {
+    rpc Register(RegisterRequest) returns (RegisterResponse) {}
+}
+
+message RegisterRequest {
+    string id = 1;
+    string addr = 2;
+}
+
+message RegisterResponse {
+}

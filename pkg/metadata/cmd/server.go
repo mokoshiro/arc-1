@@ -1,9 +1,14 @@
 package cmd
 
 import (
+	"context"
+
+	"github.com/Bo0km4n/arc/pkg/metadata/api"
 	"github.com/Bo0km4n/arc/pkg/metadata/cmd/option"
+	"github.com/Bo0km4n/arc/pkg/metadata/domain/repository"
 	"github.com/Bo0km4n/arc/pkg/metadata/infra/db"
-	"github.com/Bo0km4n/arc/pkg/metadata/router"
+	"github.com/Bo0km4n/arc/pkg/metadata/usecase"
+	"github.com/Bo0km4n/arc/pkg/rpc"
 	"github.com/spf13/cobra"
 )
 
@@ -15,12 +20,13 @@ var serverCmd = &cobra.Command{
 	},
 	Run: func(cmd *cobra.Command, args []string) {
 		// Run Gateway API task
-		Server()
+		Server(context.Background())
 	},
 }
 
 func init() {
 	rootCmd.AddCommand(serverCmd)
+	serverCmd.Flags().StringVarP(&option.Opt.Port, "port", "p", "50051", "listen port")
 	serverCmd.Flags().BoolVarP(&option.Opt.UseRedis, "use_redis", "", true, "use redis")
 	serverCmd.Flags().StringVarP(&option.Opt.RedisHost, "redis_host", "", "127.0.0.1:6379", "redis host address")
 	serverCmd.Flags().IntVarP(&option.Opt.RedisMaxIdle, "redis_max_idle", "", 32, "redis max idle connection")
@@ -30,7 +36,18 @@ func init() {
 }
 
 // Server returns API object
-func Server() {
-	api := router.New()
-	api.Run(":8080")
+func Server(ctx context.Context) error {
+	registerRepo := repository.NewRegisterRepository(db.DB_REDIS)
+	registerUsecase := usecase.NewRegisterUsecase(registerRepo)
+	metadataAPI := api.NewMetadataAPI(registerUsecase)
+
+	server := rpc.NewServer(metadataAPI, rpc.WithPort(50051))
+	defer func() {
+		server.Stop(10)
+	}()
+	go server.Run()
+
+	// Waiting the signals
+	<-ctx.Done()
+	return nil
 }

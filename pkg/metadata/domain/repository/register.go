@@ -2,6 +2,7 @@ package repository
 
 import (
 	"github.com/Bo0km4n/arc/pkg/metadata/cmd/option"
+	"github.com/Bo0km4n/arc/pkg/metadata/infra/db"
 	"github.com/garyburd/redigo/redis"
 )
 
@@ -17,9 +18,18 @@ type registerRDBRepository struct {
 	// *sql.DB
 }
 
-func NewRegisterKVSRepository(redisPool *redis.Pool) RegisterRepository {
+func newRegisterKVSRepository(redisPool *redis.Pool) RegisterRepository {
 	return &registerKVSRepository{
 		redisPool: redisPool,
+	}
+}
+
+func NewRegisterRepository(dbType int) RegisterRepository {
+	switch dbType {
+	case db.DB_REDIS:
+		return newRegisterKVSRepository(db.RedisPool)
+	default:
+		return nil
 	}
 }
 

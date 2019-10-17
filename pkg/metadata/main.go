@@ -1,7 +1,7 @@
 package main
 
-import "fmt"
+import "github.com/Bo0km4n/arc/pkg/metadata/cmd"
 
 func main() {
-	fmt.Println("GeoCache")
+	cmd.Execute()
 }

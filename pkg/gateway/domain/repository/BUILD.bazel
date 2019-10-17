@@ -1,0 +1,11 @@
+load("@io_bazel_rules_go//go:def.bzl", "go_library")
+
+go_library(
+    name = "go_default_library",
+    srcs = [
+        "metadata.go",
+        "tracker.go",
+    ],
+    importpath = "github.com/Bo0km4n/arc/pkg/gateway/domain/repository",
+    visibility = ["//visibility:public"],
+)

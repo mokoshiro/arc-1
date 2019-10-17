@@ -1,0 +1,14 @@
+load("@io_bazel_rules_go//go:def.bzl", "go_library")
+
+go_library(
+    name = "go_default_library",
+    srcs = ["router.go"],
+    importpath = "github.com/Bo0km4n/arc/pkg/gateway/router",
+    visibility = ["//visibility:public"],
+    deps = [
+        "//pkg/gateway/api/handler:go_default_library",
+        "//pkg/gateway/domain/repository:go_default_library",
+        "//pkg/gateway/usecase:go_default_library",
+        "@com_github_gin_gonic_gin//:go_default_library",
+    ],
+)

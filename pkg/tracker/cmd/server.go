@@ -4,11 +4,11 @@ import (
 	"context"
 
 	"github.com/Bo0km4n/arc/internal/rpc"
-	"github.com/Bo0km4n/arc/pkg/metadata/api"
-	"github.com/Bo0km4n/arc/pkg/metadata/cmd/option"
-	"github.com/Bo0km4n/arc/pkg/metadata/domain/repository"
-	"github.com/Bo0km4n/arc/pkg/metadata/infra/db"
-	"github.com/Bo0km4n/arc/pkg/metadata/usecase"
+	"github.com/Bo0km4n/arc/pkg/tracker/api"
+	"github.com/Bo0km4n/arc/pkg/tracker/cmd/option"
+	"github.com/Bo0km4n/arc/pkg/tracker/domain/repository"
+	"github.com/Bo0km4n/arc/pkg/tracker/infra/db"
+	"github.com/Bo0km4n/arc/pkg/tracker/usecase"
 	"github.com/spf13/cobra"
 )
 
@@ -39,9 +39,9 @@ func init() {
 func Server(ctx context.Context) error {
 	registerRepo := repository.NewRegisterRepository(db.DB_REDIS)
 	registerUsecase := usecase.NewRegisterUsecase(registerRepo)
-	metadataAPI := api.NewMetadataAPI(registerUsecase)
+	trackerAPI := api.NewtrackerAPI(registerUsecase)
 
-	server := rpc.NewServer(metadataAPI, rpc.WithPort(option.Opt.Port))
+	server := rpc.NewServer(trackerAPI, rpc.WithPort(option.Opt.Port))
 	defer func() {
 		server.Stop(10)
 	}()

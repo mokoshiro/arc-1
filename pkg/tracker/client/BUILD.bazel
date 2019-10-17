@@ -1,0 +1,14 @@
+load("@io_bazel_rules_go//go:def.bzl", "go_library")
+
+go_library(
+    name = "go_default_library",
+    srcs = ["client.go"],
+    importpath = "github.com/Bo0km4n/arc/pkg/tracker/client",
+    visibility = ["//visibility:public"],
+    deps = [
+        "//internal/dialer:go_default_library",
+        "//pkg/tracker/api/proto:go_default_library",
+        "@io_opencensus_go//plugin/ocgrpc:go_default_library",
+        "@org_golang_google_grpc//:go_default_library",
+    ],
+)

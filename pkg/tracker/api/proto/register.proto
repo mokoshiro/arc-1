@@ -1,0 +1,16 @@
+syntax = "proto3";
+
+package proto;
+
+service Tracker {
+    rpc Register(RegisterRequest) returns (RegisterResponse) {}
+}
+
+message RegisterRequest {
+    string id = 1;
+    double latitude = 2;
+    double longitude = 3;
+}
+
+message RegisterResponse {
+}

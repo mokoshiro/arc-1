@@ -1,0 +1,15 @@
+load("@io_bazel_rules_go//go:def.bzl", "go_library")
+
+go_library(
+    name = "go_default_library",
+    srcs = [
+        "entity.go",
+        "redis.go",
+    ],
+    importpath = "github.com/Bo0km4n/arc/pkg/tracker/infra/db",
+    visibility = ["//visibility:public"],
+    deps = [
+        "//pkg/tracker/cmd/option:go_default_library",
+        "@com_github_garyburd_redigo//redis:go_default_library",
+    ],
+)

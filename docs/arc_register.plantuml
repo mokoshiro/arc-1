@@ -4,15 +4,14 @@ participant "Peer" as peer
 participant "STUN Server" as stun
 
 participant "Gateway API" as gateway
+participant "Locker DB" as locker
 
-box "Container" #LightBlue
-    participant "Metadata API" as metadata
-    participant "Metadata DB" as metadb
-end box
+participant "Metadata API" as metadata
+participant "Tracker API" as tracker
 
-box "Container" #LightBlue
-    participant "Tracker API" as tracker
+box "Displaceable DB" #LightBlue
     participant "Tracker DB" as trackerdb
+    participant "Metadata DB" as metadb
 end box
 
 activate peer
@@ -23,6 +22,11 @@ deactivate stun
 
 peer -> gateway: IP, Port, ID(as Register Information), Location Information(LI)
 activate gateway
+gateway -> locker: Lock ID
+opt Can't get lock
+    gateway --> peer: Failed register
+end
+== Lock ID == 
 gateway -> metadata: Register Information
 activate metadata
 metadata -> metadb: Register Information
@@ -44,6 +48,9 @@ end note
 deactivate trackerdb
 tracker --> gateway: ok
 deactivate tracker
+gateway -> locker: Unlock ID
+== Unlock ID ==
+
 gateway --> peer: ok
 deactivate gateway
 @enduml

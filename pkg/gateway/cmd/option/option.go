@@ -1,9 +1,10 @@
 package option
 
-type option struct {
+type Option struct {
 	MetadataHost string
+	TrackerHost  string
 }
 
 var (
-	Opt *option
+	Opt = &Option{}
 )

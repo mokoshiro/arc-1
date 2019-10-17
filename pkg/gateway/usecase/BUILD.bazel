@@ -5,5 +5,8 @@ go_library(
     srcs = ["register.go"],
     importpath = "github.com/Bo0km4n/arc/pkg/gateway/usecase",
     visibility = ["//visibility:public"],
-    deps = ["//pkg/gateway/domain/repository:go_default_library"],
+    deps = [
+        "//pkg/gateway/domain/model:go_default_library",
+        "//pkg/gateway/domain/repository:go_default_library",
+    ],
 )

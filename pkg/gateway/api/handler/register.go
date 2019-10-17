@@ -1,23 +1,37 @@
 package handler
 
 import (
+	"fmt"
+
+	"github.com/Bo0km4n/arc/pkg/gateway/domain/model"
 	"github.com/Bo0km4n/arc/pkg/gateway/usecase"
 	"github.com/gin-gonic/gin"
+	"go.uber.org/zap"
 )
 
 type RegisterHandler struct {
+	logger     *zap.Logger
 	RegisterUC usecase.RegisterUsecase
 }
 
 func RegisterResource(e *gin.Engine, ruc usecase.RegisterUsecase) {
 	h := RegisterHandler{RegisterUC: ruc}
-	e.Group("/api/register")
+	g := e.Group("/api/register")
 	{
-		e.POST("", h.Register)
+		g.POST("", h.Register)
 	}
 }
 
 // Register POST /api/register
 func (rh *RegisterHandler) Register(c *gin.Context) {
-	c.JSON(200, gin.H{"message": "registered"})
+	req := &model.RegisterRequest{}
+	if err := c.BindJSON(req); err != nil {
+		c.AbortWithError(400, fmt.Errorf("Invalid register request"))
+		return
+	}
+	if err := rh.RegisterUC.Register(req); err != nil {
+		rh.logger.Error(err.Error())
+		c.AbortWithError(503, fmt.Errorf("Failed register process"))
+	}
+	c.JSON(200, &model.RegisterResponse{})
 }

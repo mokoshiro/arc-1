@@ -8,4 +8,8 @@ go_library(
     ],
     importpath = "github.com/Bo0km4n/arc/pkg/gateway/domain/repository",
     visibility = ["//visibility:public"],
+    deps = [
+        "//pkg/metadata/client:go_default_library",
+        "//pkg/tracker/client:go_default_library",
+    ],
 )

@@ -1,9 +1,12 @@
 package usecase
 
-import "github.com/Bo0km4n/arc/pkg/gateway/domain/repository"
+import (
+	"github.com/Bo0km4n/arc/pkg/gateway/domain/model"
+	"github.com/Bo0km4n/arc/pkg/gateway/domain/repository"
+)
 
 type RegisterUsecase interface {
-	Register()
+	Register(req *model.RegisterRequest) error
 }
 
 type registerUsecase struct {
@@ -11,8 +14,8 @@ type registerUsecase struct {
 	trackerRepo  repository.TrackerRepository
 }
 
-func (ru *registerUsecase) Register() {
-
+func (ru *registerUsecase) Register(req *model.RegisterRequest) error {
+	return nil
 }
 
 func NewRegisterUsecase(metaRepo repository.MetadataRepository, trackerRepo repository.TrackerRepository) RegisterUsecase {

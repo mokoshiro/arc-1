@@ -15,20 +15,20 @@ type LockerRepository interface {
 }
 
 type lockerRepository struct {
-	db           *redis.Pool
-	lockExpire   int
-	lockSleep    int
-	lockID       int64
-	lockWaitNano int64
+	db            *redis.Pool
+	lockExpire    int
+	lockSleepNano int64
+	lockID        int64
+	lockWaitNano  int64
 }
 
-func NewLockerRepository(db *redis.Pool, lockExpire, lockSleep int, lockID, lockWaitNano int64) LockerRepository {
+func NewLockerRepository(db *redis.Pool, lockExpire int, lockSleepNano int64, lockID, lockWaitNano int64) LockerRepository {
 	return &lockerRepository{
-		db:           db,
-		lockExpire:   lockExpire,
-		lockSleep:    lockSleep,
-		lockID:       lockID,
-		lockWaitNano: lockWaitNano,
+		db:            db,
+		lockExpire:    lockExpire,
+		lockSleepNano: lockSleepNano,
+		lockID:        lockID,
+		lockWaitNano:  lockWaitNano,
 	}
 }
 
@@ -51,7 +51,7 @@ func (lr *lockerRepository) Lock(ctx context.Context, key string) error {
 
 		// If reply value is 0, this key already is locked by another instance.
 		if rep == 0 {
-			time.Sleep(time.Duration(lr.lockSleep))
+			time.Sleep(time.Duration(lr.lockSleepNano))
 			// retry lock
 			continue
 		}

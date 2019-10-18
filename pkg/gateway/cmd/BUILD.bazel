@@ -10,6 +10,7 @@ go_library(
     visibility = ["//visibility:public"],
     deps = [
         "//pkg/gateway/cmd/option:go_default_library",
+        "//pkg/gateway/infra/db:go_default_library",
         "//pkg/gateway/router:go_default_library",
         "@com_github_spf13_cobra//:go_default_library",
         "@org_uber_go_zap//:go_default_library",

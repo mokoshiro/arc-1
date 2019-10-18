@@ -2,6 +2,7 @@ package router
 
 import (
 	"context"
+	"fmt"
 
 	"github.com/Bo0km4n/arc/pkg/gateway/api/handler"
 	"github.com/Bo0km4n/arc/pkg/gateway/cmd/option"
@@ -42,13 +43,13 @@ func New(ctx context.Context, logger *zap.Logger, opt *option.Option) (*Router, 
 	if opt.TrackerHost != "" {
 		cli, err := trackerclient.NewClient(
 			ctx,
-			opt.MetadataHost,
+			opt.TrackerHost,
 			grpc.WithInsecure(),
 		)
 		if err != nil {
 			return nil, err
 		}
-		logger.Info("connected tracker host")
+		logger.Info(fmt.Sprintf("connected tracker host: %s", opt.TrackerHost))
 		r.tc = cli
 	}
 

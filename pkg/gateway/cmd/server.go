@@ -8,6 +8,7 @@ import (
 	"github.com/Bo0km4n/arc/pkg/gateway/router"
 	"github.com/spf13/cobra"
 	"go.uber.org/zap"
+	"github.com/Bo0km4n/arc/pkg/gateway/infra/db"
 )
 
 // serverCmd represents the web command
@@ -15,6 +16,7 @@ var serverCmd = &cobra.Command{
 	Use: "server",
 	PreRun: func(cmd *cobra.Command, args []string) {
 		// Nothing
+		db.InitRedisPool()
 	},
 	Run: func(cmd *cobra.Command, args []string) {
 		// Run Gateway API task
@@ -26,6 +28,11 @@ func init() {
 	rootCmd.AddCommand(serverCmd)
 	serverCmd.Flags().StringVarP(&option.Opt.MetadataHost, "metadata_host", "", "127.0.0.1:50051", "metadata host address")
 	serverCmd.Flags().StringVarP(&option.Opt.TrackerHost, "tracker_host", "", "127.0.0.1:50052", "tracker host address")
+	serverCmd.Flags().StringVarP(&option.Opt.RedisHost, "redis_host", "", "127.0.0.1:6379", "redis host address")
+	serverCmd.Flags().IntVarP(&option.Opt.RedisMaxIdle, "redis_max_idle", "", 32, "redis max idle connection")
+	serverCmd.Flags().IntVarP(&option.Opt.RedisActive, "redis_max_active", "", 64, "redis max active connection")
+	serverCmd.Flags().IntVarP(&option.Opt.RedisIdleTimeout, "redis_idle_timeout", "", 240, "redis idle timeout connection")
+	serverCmd.Flags().IntVarP(&option.Opt.RedisKeyExpire, "redis_key_expire", "", 3600, "redis key expire")
 }
 
 // Server returns API object

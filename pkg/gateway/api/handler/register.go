@@ -14,8 +14,8 @@ type RegisterHandler struct {
 	RegisterUC usecase.RegisterUsecase
 }
 
-func RegisterResource(e *gin.Engine, ruc usecase.RegisterUsecase) {
-	h := RegisterHandler{RegisterUC: ruc}
+func RegisterResource(e *gin.Engine, ruc usecase.RegisterUsecase, logger *zap.Logger) {
+	h := RegisterHandler{RegisterUC: ruc, logger: logger}
 	g := e.Group("/api/register")
 	{
 		g.POST("", h.Register)
@@ -32,6 +32,7 @@ func (rh *RegisterHandler) Register(c *gin.Context) {
 	if err := rh.RegisterUC.Register(req); err != nil {
 		rh.logger.Error(err.Error())
 		c.AbortWithError(503, fmt.Errorf("Failed register process"))
+		return
 	}
 	c.JSON(200, &model.RegisterResponse{})
 }

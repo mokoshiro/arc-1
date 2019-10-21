@@ -9,6 +9,7 @@ go_library(
         "//pkg/gateway/api/handler:go_default_library",
         "//pkg/gateway/cmd/option:go_default_library",
         "//pkg/gateway/domain/repository:go_default_library",
+        "//pkg/gateway/infra/db:go_default_library",
         "//pkg/gateway/usecase:go_default_library",
         "//pkg/metadata/client:go_default_library",
         "//pkg/tracker/client:go_default_library",

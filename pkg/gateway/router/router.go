@@ -7,6 +7,7 @@ import (
 	"github.com/Bo0km4n/arc/pkg/gateway/api/handler"
 	"github.com/Bo0km4n/arc/pkg/gateway/cmd/option"
 	"github.com/Bo0km4n/arc/pkg/gateway/domain/repository"
+	"github.com/Bo0km4n/arc/pkg/gateway/infra/db"
 	"github.com/Bo0km4n/arc/pkg/gateway/usecase"
 	metadataclient "github.com/Bo0km4n/arc/pkg/metadata/client"
 	trackerclient "github.com/Bo0km4n/arc/pkg/tracker/client"
@@ -63,10 +64,11 @@ func New(ctx context.Context, logger *zap.Logger, opt *option.Option) (*Router, 
 
 	{
 		// Register
+		lockerRepo := repository.NewLockerRepository(db.RedisPool, 10, int64(100), int64(1), int64(100))
 		metadataRepo := repository.NewMetadataRepository(r.mc)
 		trackerRepo := repository.NewTrackerRepository(r.tc)
-		ruc := usecase.NewRegisterUsecase(metadataRepo, trackerRepo)
-		handler.RegisterResource(r.engine, ruc)
+		ruc := usecase.NewRegisterUsecase(metadataRepo, trackerRepo, lockerRepo)
+		handler.RegisterResource(r.engine, ruc, logger)
 	}
 
 	return r, nil

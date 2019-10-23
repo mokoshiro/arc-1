@@ -5,17 +5,16 @@ import (
 	"log"
 
 	"github.com/Bo0km4n/arc/pkg/gateway/cmd/option"
+	"github.com/Bo0km4n/arc/pkg/gateway/infra/db"
 	"github.com/Bo0km4n/arc/pkg/gateway/router"
 	"github.com/spf13/cobra"
 	"go.uber.org/zap"
-	"github.com/Bo0km4n/arc/pkg/gateway/infra/db"
 )
 
 // serverCmd represents the web command
 var serverCmd = &cobra.Command{
 	Use: "server",
 	PreRun: func(cmd *cobra.Command, args []string) {
-		// Nothing
 		db.InitRedisPool()
 	},
 	Run: func(cmd *cobra.Command, args []string) {

@@ -37,7 +37,7 @@ func New(ctx context.Context, logger *zap.Logger, opt *option.Option) (*Router, 
 		if err != nil {
 			return nil, err
 		}
-		logger.Info("connected metadata host")
+		logger.Info(fmt.Sprintf("connected metadata host: %s", opt.MetadataHost))
 		r.mc = cli
 	}
 

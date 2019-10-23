@@ -10,6 +10,7 @@ import (
 
 type MetadataRepository interface {
 	Register(ctx context.Context, peerID, addr string) error
+	GetMember(ctx context.Context, req *proto.GetMemberRequest) (*proto.GetMemberResponse, error)
 }
 
 type metadataRepository struct {
@@ -26,6 +27,10 @@ func (mr *metadataRepository) Register(ctx context.Context, peerID, addr string)
 		return xerrors.Errorf("metadataRepository.Register: %w", err)
 	}
 	return nil
+}
+
+func (mr *metadataRepository) GetMember(ctx context.Context, req *proto.GetMemberRequest) (*proto.GetMemberResponse, error) {
+	return mr.Client.GetMember(ctx, req)
 }
 
 func NewMetadataRepository(client metadataclient.Client) MetadataRepository {

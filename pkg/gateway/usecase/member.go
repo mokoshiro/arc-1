@@ -9,6 +9,7 @@ import (
 	"github.com/Bo0km4n/arc/pkg/gateway/domain/model"
 	"github.com/Bo0km4n/arc/pkg/gateway/domain/repository"
 	"github.com/Bo0km4n/arc/pkg/tracker/api/proto"
+	metaproto "github.com/Bo0km4n/arc/pkg/metadata/api/proto"
 )
 
 type MemberUsecase interface {
@@ -60,6 +61,7 @@ func (ru *memberUsecase) Register(req *model.RegisterRequest) error {
 }
 
 func (muc *memberUsecase) GetMemberByRadius(req *model.GetMemberByRadiusRequest) (*model.GetMemberByRadiusResponse, error) {
+	ctx := context.Background()
 	res := &model.GetMemberByRadiusResponse{
 		Members: []*model.Member{},
 	}
@@ -78,7 +80,7 @@ func (muc *memberUsecase) GetMemberByRadius(req *model.GetMemberByRadiusRequest)
 		unit = proto.GetMemberByRadiusRequest_KM
 	}
 
-	trackerRes, err := muc.trackerRepo.GetMemberByRadius(context.Background(), &proto.GetMemberByRadiusRequest{
+	trackerRes, err := muc.trackerRepo.GetMemberByRadius(ctx, &proto.GetMemberByRadiusRequest{
 		Longitude: req.Location.Longitude,
 		Latitude:  req.Location.Latitude,
 		Radius:    req.Radius,
@@ -87,6 +89,18 @@ func (muc *memberUsecase) GetMemberByRadius(req *model.GetMemberByRadiusRequest)
 	if err != nil {
 		return nil, err
 	}
+
+	ids := make([]string, len(trackerRes.Members))
+	for i := range trackerRes.Members {
+		ids[i] = trackerRes.Members[i].PeerId
+	}
+	metadataRes, err := muc.metadataRepo.GetMember(ctx, &metaproto.GetMemberRequest{
+		PeerIds: ids,
+	})
+	if err != nil {
+		return nil, err
+	}
+
 	res.Members = make([]*model.Member, len(trackerRes.Members))
 	for i, v := range trackerRes.Members {
 		res.Members[i] = &model.Member{
@@ -94,9 +108,11 @@ func (muc *memberUsecase) GetMemberByRadius(req *model.GetMemberByRadiusRequest)
 				Latitude:  v.Latitude,
 				Longitude: v.Longitude,
 			},
-			ID: v.PeerId,
+			ID:   v.PeerId,
+			Addr: metadataRes.Members[i].Addr,
 		}
 	}
+
 	return res, nil
 }
 

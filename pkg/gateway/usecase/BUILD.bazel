@@ -8,6 +8,7 @@ go_library(
     deps = [
         "//pkg/gateway/domain/model:go_default_library",
         "//pkg/gateway/domain/repository:go_default_library",
+        "//pkg/metadata/api/proto:go_default_library",
         "//pkg/tracker/api/proto:go_default_library",
     ],
 )

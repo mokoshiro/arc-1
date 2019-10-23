@@ -16,10 +16,14 @@ message RegisterResponse {
 }
 
 message GetMemberRequest {
-    string peer_id = 1;
+    repeated string peer_ids = 1;
 }
 
 message GetMemberResponse {
+    repeated MetadataMember members = 1;
+}
+
+message MetadataMember {
     string peer_id = 1;
     string addr = 2;
 }

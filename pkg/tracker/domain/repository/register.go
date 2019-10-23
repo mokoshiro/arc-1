@@ -4,6 +4,7 @@ import (
 	"strconv"
 
 	"github.com/Bo0km4n/arc/pkg/tracker/api/proto"
+	"github.com/Bo0km4n/arc/pkg/tracker/cmd/option"
 	"github.com/Bo0km4n/arc/pkg/tracker/infra/db"
 	"github.com/garyburd/redigo/redis"
 )
@@ -41,7 +42,10 @@ func NewMemberRepository(dbType int) MemberRepository {
 func (mr *memberKVSRepository) Register(h3Hash, peerID string, longitude, latitude float64) error {
 	conn := mr.redisPool.Get()
 	defer conn.Close()
-	_, err := conn.Do("GEOADD", h3Hash, longitude, latitude, peerID)
+	if _, err := conn.Do("GEOADD", h3Hash, longitude, latitude, peerID); err != nil {
+		return err
+	}
+	_, err := conn.Do("EXPIRE", h3Hash, option.Opt.RedisKeyExpire)
 	return err
 }
 

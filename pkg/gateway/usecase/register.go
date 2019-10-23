@@ -12,6 +12,7 @@ import (
 
 type MemberUsecase interface {
 	Register(req *model.RegisterRequest) error
+	GetMemberByRadius(req *model.GetMemberByRadiusRequest) (*model.GetMemberByRadiusResponse, error)
 }
 
 type memberUsecase struct {
@@ -55,6 +56,10 @@ func (ru *memberUsecase) Register(req *model.RegisterRequest) error {
 	}
 
 	return nil
+}
+
+func (muc *memberUsecase) GetMemberByRadius(req *model.GetMemberByRadiusRequest) (*model.GetMemberByRadiusResponse, error) {
+	return nil, nil
 }
 
 func NewMemberUsecase(

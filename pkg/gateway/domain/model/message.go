@@ -17,3 +17,13 @@ type GetMemberByRadiusRequest struct {
 	WithCoord bool      `form:"with_coord" binding:"required"`
 	Unit      string    `form:"unit" binding:"required"`
 }
+
+type GetMemberByRadiusResponse struct {
+	Members []*Member `json:"members"`
+}
+
+type Member struct {
+	Location *Location `json:"location"`
+	Addr     string    `json:"string"`
+	ID       string    `json:"id"`
+}

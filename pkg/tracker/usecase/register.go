@@ -1,11 +1,14 @@
 package usecase
 
 import (
+	"errors"
 	"os/exec"
 
 	"fmt"
 
 	"strings"
+
+	"context"
 
 	"github.com/Bo0km4n/arc/pkg/tracker/api/proto"
 	"github.com/Bo0km4n/arc/pkg/tracker/cmd/option"
@@ -13,15 +16,16 @@ import (
 	"github.com/Bo0km4n/arc/pkg/tracker/logger"
 )
 
-type RegisterUsecase interface {
+type MemberUsecase interface {
 	Register(req *proto.RegisterRequest) error
+	GetMemberByRadius(ctx context.Context, req *proto.GetMemberByRadiusRequest) (*proto.GetMemberByRadiusResponse, error)
 }
 
-type registerUsecase struct {
-	rr repository.RegisterRepository
+type memberUsecase struct {
+	mr repository.MemberRepository
 }
 
-func (ru *registerUsecase) Register(req *proto.RegisterRequest) error {
+func (ru *memberUsecase) Register(req *proto.RegisterRequest) error {
 	// preprocess request
 	hashStr, err := ru.invokeH3(option.Opt.GeoResolution, req.Longitude, req.Latitude)
 	if err != nil {
@@ -29,14 +33,44 @@ func (ru *registerUsecase) Register(req *proto.RegisterRequest) error {
 		return err
 	}
 	logger.L.Debug(hashStr)
-	if err := ru.rr.Register(hashStr, req.Id, req.Longitude, req.Latitude); err != nil {
+	if err := ru.mr.Register(hashStr, req.Id, req.Longitude, req.Latitude); err != nil {
 		logger.L.Error(err.Error())
 		return err
 	}
 	return nil
 }
 
-func (ru *registerUsecase) invokeH3(resolution int, longitude, latitude float64) (string, error) {
+func (mu *memberUsecase) GetMemberByRadius(ctx context.Context, req *proto.GetMemberByRadiusRequest) (*proto.GetMemberByRadiusResponse, error) {
+	hashStr, err := mu.invokeH3(option.Opt.GeoResolution, req.Longitude, req.Latitude)
+	if err != nil {
+		logger.L.Error(err.Error())
+		return nil, err
+	}
+	var unit string
+	switch req.Unit {
+	case proto.GetMemberByRadiusRequest_KM:
+		unit = "km"
+	case proto.GetMemberByRadiusRequest_M:
+		unit = "m"
+	case proto.GetMemberByRadiusRequest_MI:
+		unit = "mi"
+	case proto.GetMemberByRadiusRequest_FT:
+		unit = "ft"
+	default:
+		return nil, errors.New("Not matched unit name")
+	}
+
+	res, err := mu.mr.GetMemberByRadius(
+		hashStr, req.Longitude,
+		req.Latitude, req.Radius, unit)
+	if err != nil {
+		logger.L.Error(err.Error())
+		return nil, err
+	}
+	return res, nil
+}
+
+func (ru *memberUsecase) invokeH3(resolution int, longitude, latitude float64) (string, error) {
 	args := []string{
 		"--resolution", fmt.Sprintf("%d", resolution),
 		"--longitude", fmt.Sprintf("%f", longitude),
@@ -51,8 +85,8 @@ func (ru *registerUsecase) invokeH3(resolution int, longitude, latitude float64)
 	return result, err
 }
 
-func NewRegisterUsecase(rr repository.RegisterRepository) RegisterUsecase {
-	return &registerUsecase{
-		rr: rr,
+func NewMemberUsecase(mr repository.MemberRepository) MemberUsecase {
+	return &memberUsecase{
+		mr: mr,
 	}
 }

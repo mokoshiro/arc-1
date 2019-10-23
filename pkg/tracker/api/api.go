@@ -11,10 +11,10 @@ import (
 
 type trackerAPI struct {
 	logger     *zap.Logger
-	registerUC usecase.RegisterUsecase
+	registerUC usecase.MemberUsecase
 }
 
-func NewtrackerAPI(ruc usecase.RegisterUsecase) *trackerAPI {
+func NewtrackerAPI(ruc usecase.MemberUsecase) *trackerAPI {
 	return &trackerAPI{
 		registerUC: ruc,
 	}
@@ -25,6 +25,14 @@ func (api *trackerAPI) Register(ctx context.Context, req *proto.RegisterRequest)
 		return nil, err
 	}
 	return &proto.RegisterResponse{}, nil
+}
+
+func (api *trackerAPI) GetMemberByRadius(ctx context.Context, req *proto.GetMemberByRadiusRequest) (*proto.GetMemberByRadiusResponse, error) {
+	res, err := api.registerUC.GetMemberByRadius(ctx, req)
+	if err != nil {
+		return nil, err
+	}
+	return res, nil
 }
 
 func (api *trackerAPI) Embed(server *grpc.Server, logger *zap.Logger) {

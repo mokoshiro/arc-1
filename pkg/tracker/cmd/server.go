@@ -40,9 +40,9 @@ func init() {
 
 // Server returns API object
 func Server(ctx context.Context) error {
-	registerRepo := repository.NewRegisterRepository(db.DB_REDIS)
-	registerUsecase := usecase.NewRegisterUsecase(registerRepo)
-	trackerAPI := api.NewtrackerAPI(registerUsecase)
+	memberRepo := repository.NewMemberRepository(db.DB_REDIS)
+	memberUsecase := usecase.NewMemberUsecase(memberRepo)
+	trackerAPI := api.NewtrackerAPI(memberUsecase)
 
 	server := rpc.NewServer(trackerAPI, rpc.WithPort(option.Opt.Port))
 	defer func() {

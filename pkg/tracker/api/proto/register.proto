@@ -4,6 +4,7 @@ package proto;
 
 service Tracker {
     rpc Register(RegisterRequest) returns (RegisterResponse) {}
+    rpc GetMemberByRadius(GetMemberByRadiusRequest) returns (GetMemberByRadiusResponse) {}
 }
 
 message RegisterRequest {
@@ -13,4 +14,28 @@ message RegisterRequest {
 }
 
 message RegisterResponse {
+}
+
+message GetMemberByRadiusRequest {
+    double longitude = 1;
+    double latitude = 2;
+    double radius = 3;
+    enum Unit {
+        M = 0;
+        KM = 1;
+        FT = 2;
+        MI = 3;
+    }
+    bool with_coord = 4;
+    Unit unit = 5;
+}
+
+message GetMemberByRadiusResponse {
+    repeated TrackingMember members = 1;
+}
+
+message TrackingMember {
+    double longitude = 1;
+    double latitude = 2;
+    string peer_id = 3;
 }

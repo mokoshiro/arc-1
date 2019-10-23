@@ -234,7 +234,7 @@ go_repository(
 go_repository(
     name = "com_github_mattn_go_isatty",
     importpath = "github.com/mattn/go-isatty",
-    tag = "v0.0.7",
+    tag = "v0.0.8",
 )
 
 go_repository(
@@ -859,4 +859,22 @@ go_repository(
     name = "com_github_uber_h3_go",
     importpath = "github.com/uber/h3-go",
     tag = "v3.0.1",
+)
+
+go_repository(
+    name = "com_github_k0kubun_colorstring",
+    commit = "9440f1994b88",
+    importpath = "github.com/k0kubun/colorstring",
+)
+
+go_repository(
+    name = "com_github_k0kubun_pp",
+    importpath = "github.com/k0kubun/pp",
+    tag = "v3.0.1",
+)
+
+go_repository(
+    name = "com_github_mattn_go_colorable",
+    importpath = "github.com/mattn/go-colorable",
+    tag = "v0.1.4",
 )

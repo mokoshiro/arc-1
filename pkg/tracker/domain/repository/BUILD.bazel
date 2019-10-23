@@ -9,6 +9,5 @@ go_library(
         "//pkg/tracker/api/proto:go_default_library",
         "//pkg/tracker/infra/db:go_default_library",
         "@com_github_garyburd_redigo//redis:go_default_library",
-        "@com_github_k0kubun_pp//:go_default_library",
     ],
 )

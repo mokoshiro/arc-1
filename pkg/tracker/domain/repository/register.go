@@ -32,8 +32,9 @@ func NewRegisterRepository(dbType int) RegisterRepository {
 	}
 }
 
-func (rr *registerKVSRepository) Register(h3Hash, peerID string, latitude, longitude float64) error {
+func (rr *registerKVSRepository) Register(h3Hash, peerID string, longitude, latitude float64) error {
 	conn := rr.redisPool.Get()
-	_, err := conn.Do("GEOADD", h3Hash, longitude, longitude, peerID)
+	defer conn.Close()
+	_, err := conn.Do("GEOADD", h3Hash, longitude, latitude, peerID)
 	return err
 }

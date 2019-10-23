@@ -7,6 +7,8 @@ go_library(
     visibility = ["//visibility:public"],
     deps = [
         "//pkg/tracker/api/proto:go_default_library",
+        "//pkg/tracker/cmd/option:go_default_library",
         "//pkg/tracker/domain/repository:go_default_library",
+        "//pkg/tracker/logger:go_default_library",
     ],
 )

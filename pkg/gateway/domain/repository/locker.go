@@ -19,16 +19,16 @@ type lockerRepository struct {
 	lockExpire    int
 	lockSleepNano int64
 	lockID        int64
-	lockWaitNano  int64
+	lockWaitMill  int64
 }
 
-func NewLockerRepository(db *redis.Pool, lockExpire int, lockSleepNano int64, lockID, lockWaitNano int64) LockerRepository {
+func NewLockerRepository(db *redis.Pool, lockExpire int, lockSleepNano int64, lockID, lockWaitMill int64) LockerRepository {
 	return &lockerRepository{
 		db:            db,
 		lockExpire:    lockExpire,
 		lockSleepNano: lockSleepNano,
 		lockID:        lockID,
-		lockWaitNano:  lockWaitNano,
+		lockWaitMill:  lockWaitMill,
 	}
 }
 
@@ -37,10 +37,10 @@ func (lr *lockerRepository) Lock(ctx context.Context, key string) error {
 	defer conn.Close()
 
 	// Max waiting time
-	maxWaitNano := time.Now().UnixNano() + lr.lockWaitNano
+	maxWaitMill := float64(time.Now().Unix()) + float64(lr.lockWaitMill)/1000
 
 	for {
-		if maxWaitNano >= time.Now().UnixNano() {
+		if maxWaitMill <= float64(time.Now().Unix()) {
 			return xerrors.Errorf("Lock timeout: key=%s", key)
 		}
 

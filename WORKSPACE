@@ -101,6 +101,14 @@ http_archive(
     strip_prefix = "rules_proto-1d6550fc2e625d47dc4faadac92d7cb20e3ba5c5",
 )
 
+### CGO libraries
+new_git_repository(
+    name = "com_github_uber_h3_go",
+    remote = "https://github.com/uber/h3-go.git",
+    commit = "ba79e9fc50a2cbf5ab898f6268dc507f1037ef26",
+    build_file = "@arc//:builds/h3.BUILD",
+)
+
 ### Auto generated
 
 go_repository(
@@ -845,4 +853,10 @@ go_repository(
     name = "org_golang_x_xerrors",
     commit = "1b5146add898",
     importpath = "golang.org/x/xerrors",
+)
+
+go_repository(
+    name = "com_github_uber_h3_go",
+    importpath = "github.com/uber/h3-go",
+    tag = "v3.0.1",
 )

@@ -8,6 +8,7 @@ type Option struct {
 	RedisActive      int
 	RedisIdleTimeout int // second
 	RedisKeyExpire   int // second
+	GeoResolution    int
 }
 
 var (

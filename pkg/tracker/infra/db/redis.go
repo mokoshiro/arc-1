@@ -19,6 +19,7 @@ func InitDB() {
 
 func InitRedisPool() {
 	RedisPool = &redis.Pool{
+		Wait:        true,
 		MaxIdle:     option.Opt.RedisMaxIdle,
 		MaxActive:   option.Opt.RedisActive,
 		IdleTimeout: time.Duration(option.Opt.RedisIdleTimeout) * time.Second,

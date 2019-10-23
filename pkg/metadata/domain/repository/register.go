@@ -35,6 +35,7 @@ func NewRegisterRepository(dbType int) RegisterRepository {
 
 func (rr *registerKVSRepository) Register(peerID string, addr string) error {
 	conn := rr.redisPool.Get()
+	defer conn.Close()
 	_, err := conn.Do("SETEX", peerID, option.Opt.RedisKeyExpire, addr)
 	return err
 }

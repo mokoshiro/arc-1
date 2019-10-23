@@ -37,9 +37,9 @@ func init() {
 
 // Server returns API object
 func Server(ctx context.Context) error {
-	registerRepo := repository.NewRegisterRepository(db.DB_REDIS)
-	registerUsecase := usecase.NewRegisterUsecase(registerRepo)
-	metadataAPI := api.NewMetadataAPI(registerUsecase)
+	memberRepo := repository.NewMemberRepository(db.DB_REDIS)
+	memberUsecase := usecase.NewMemberUsecase(memberRepo)
+	metadataAPI := api.NewMetadataAPI(memberUsecase)
 
 	server := rpc.NewServer(metadataAPI, rpc.WithPort(option.Opt.Port))
 	defer func() {

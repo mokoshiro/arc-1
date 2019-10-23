@@ -6,34 +6,34 @@ import (
 	"github.com/garyburd/redigo/redis"
 )
 
-type RegisterRepository interface {
+type MemberRepository interface {
 	Register(peerID, addr string) error
 }
 
-type registerKVSRepository struct {
+type memberKVSRepository struct {
 	redisPool *redis.Pool
 }
 
-type registerRDBRepository struct {
+type memberRDBRepository struct {
 	// *sql.DB
 }
 
-func newRegisterKVSRepository(redisPool *redis.Pool) RegisterRepository {
-	return &registerKVSRepository{
+func newMemberKVSRepository(redisPool *redis.Pool) MemberRepository {
+	return &memberKVSRepository{
 		redisPool: redisPool,
 	}
 }
 
-func NewRegisterRepository(dbType int) RegisterRepository {
+func NewMemberRepository(dbType int) MemberRepository {
 	switch dbType {
 	case db.DB_REDIS:
-		return newRegisterKVSRepository(db.RedisPool)
+		return newMemberKVSRepository(db.RedisPool)
 	default:
 		return nil
 	}
 }
 
-func (rr *registerKVSRepository) Register(peerID string, addr string) error {
+func (rr *memberKVSRepository) Register(peerID string, addr string) error {
 	conn := rr.redisPool.Get()
 	defer conn.Close()
 	_, err := conn.Do("SETEX", peerID, option.Opt.RedisKeyExpire, addr)

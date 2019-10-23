@@ -10,21 +10,25 @@ import (
 )
 
 type metadataAPI struct {
-	logger     *zap.Logger
-	registerUC usecase.RegisterUsecase
+	logger   *zap.Logger
+	memberUC usecase.MemberUsecase
 }
 
-func NewMetadataAPI(ruc usecase.RegisterUsecase) *metadataAPI {
+func NewMetadataAPI(ruc usecase.MemberUsecase) *metadataAPI {
 	return &metadataAPI{
-		registerUC: ruc,
+		memberUC: ruc,
 	}
 }
 
 func (api *metadataAPI) Register(ctx context.Context, req *proto.RegisterRequest) (*proto.RegisterResponse, error) {
-	if err := api.registerUC.Register(req.Id, req.Addr); err != nil {
+	if err := api.memberUC.Register(req.Id, req.Addr); err != nil {
 		return nil, err
 	}
 	return &proto.RegisterResponse{}, nil
+}
+
+func (api *metadataAPI) GetMember(ctx context.Context, req *proto.GetMemberRequest) (*proto.GetMemberResponse, error) {
+	return api.memberUC.GetMember(ctx, req)
 }
 
 func (api *metadataAPI) Embed(server *grpc.Server, logger *zap.Logger) {

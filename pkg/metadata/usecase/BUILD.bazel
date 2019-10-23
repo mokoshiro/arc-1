@@ -2,8 +2,11 @@ load("@io_bazel_rules_go//go:def.bzl", "go_library")
 
 go_library(
     name = "go_default_library",
-    srcs = ["register.go"],
+    srcs = ["member.go"],
     importpath = "github.com/Bo0km4n/arc/pkg/metadata/usecase",
     visibility = ["//visibility:public"],
-    deps = ["//pkg/metadata/domain/repository:go_default_library"],
+    deps = [
+        "//pkg/metadata/api/proto:go_default_library",
+        "//pkg/metadata/domain/repository:go_default_library",
+    ],
 )

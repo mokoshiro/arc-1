@@ -10,3 +10,9 @@ type RegisterRequest struct {
 
 type RegisterResponse struct {
 }
+
+type GetMemberByRadiusRequest struct {
+	Location *Location `form:"location" binding:"required"`
+	Radius   float64   `form:"radius" binding:"required"`
+	Unit     string    `form:"unit" binding:"required"`
+}

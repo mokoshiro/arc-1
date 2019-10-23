@@ -10,17 +10,17 @@ import (
 	"github.com/Bo0km4n/arc/pkg/gateway/domain/repository"
 )
 
-type RegisterUsecase interface {
+type MemberUsecase interface {
 	Register(req *model.RegisterRequest) error
 }
 
-type registerUsecase struct {
+type memberUsecase struct {
 	metadataRepo repository.MetadataRepository
 	trackerRepo  repository.TrackerRepository
 	lockerRepo   repository.LockerRepository
 }
 
-func (ru *registerUsecase) Register(req *model.RegisterRequest) error {
+func (ru *memberUsecase) Register(req *model.RegisterRequest) error {
 	ctx, cancel := context.WithTimeout(context.Background(), 100*time.Millisecond)
 	defer cancel()
 	done := make(chan error, 1)
@@ -57,12 +57,12 @@ func (ru *registerUsecase) Register(req *model.RegisterRequest) error {
 	return nil
 }
 
-func NewRegisterUsecase(
+func NewMemberUsecase(
 	metaRepo repository.MetadataRepository,
 	trackerRepo repository.TrackerRepository,
 	lockerRepo repository.LockerRepository,
-) RegisterUsecase {
-	return &registerUsecase{
+) MemberUsecase {
+	return &memberUsecase{
 		lockerRepo:   lockerRepo,
 		metadataRepo: metaRepo,
 		trackerRepo:  trackerRepo,

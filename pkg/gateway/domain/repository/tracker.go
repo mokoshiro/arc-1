@@ -10,6 +10,7 @@ import (
 
 type TrackerRepository interface {
 	Register(ctx context.Context, peerID string, latitude, longitude float64) error
+	GetMemberByRadius(ctx context.Context, req *proto.GetMemberByRadiusRequest) (*proto.GetMemberByRadiusResponse, error)
 }
 
 type trackerRepository struct {
@@ -26,6 +27,10 @@ func (tr *trackerRepository) Register(ctx context.Context, peerID string, latitu
 		return xerrors.Errorf("trackerRepository.Register: %w", err)
 	}
 	return nil
+}
+
+func (tr *trackerRepository) GetMemberByRadius(ctx context.Context, req *proto.GetMemberByRadiusRequest) (*proto.GetMemberByRadiusResponse, error) {
+	return tr.Client.GetMemberByRadius(ctx, req)
 }
 
 func NewTrackerRepository(trackerClient trackerclient.Client) TrackerRepository {

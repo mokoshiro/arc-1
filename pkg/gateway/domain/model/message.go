@@ -23,6 +23,6 @@ type GetMemberByRadiusResponse struct {
 
 type Member struct {
 	Location *Location `json:"location"`
-	Addr     string    `json:"string"`
+	Addr     string    `json:"addr"`
 	ID       string    `json:"id"`
 }

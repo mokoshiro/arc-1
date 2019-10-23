@@ -44,5 +44,10 @@ func (mh *MemberHandler) GetMemberByRadius(c *gin.Context) {
 		c.AbortWithError(400, fmt.Errorf("Inavlid get member by radius request"))
 		return
 	}
-	c.JSON(200, gin.H{"message": "ok"})
+	res, err := mh.MemberUC.GetMemberByRadius(req)
+	if err != nil {
+		c.AbortWithError(503, err)
+		return
+	}
+	c.JSON(200, res)
 }

@@ -8,6 +8,7 @@ import (
 
 	"github.com/Bo0km4n/arc/pkg/gateway/domain/model"
 	"github.com/Bo0km4n/arc/pkg/gateway/domain/repository"
+	"github.com/Bo0km4n/arc/pkg/tracker/api/proto"
 )
 
 type MemberUsecase interface {
@@ -59,7 +60,44 @@ func (ru *memberUsecase) Register(req *model.RegisterRequest) error {
 }
 
 func (muc *memberUsecase) GetMemberByRadius(req *model.GetMemberByRadiusRequest) (*model.GetMemberByRadiusResponse, error) {
-	return nil, nil
+	res := &model.GetMemberByRadiusResponse{
+		Members: []*model.Member{},
+	}
+	var unit proto.GetMemberByRadiusRequest_Unit
+
+	switch req.Unit {
+	case "km":
+		unit = proto.GetMemberByRadiusRequest_KM
+	case "m":
+		unit = proto.GetMemberByRadiusRequest_M
+	case "mi":
+		unit = proto.GetMemberByRadiusRequest_MI
+	case "ft":
+		unit = proto.GetMemberByRadiusRequest_FT
+	default:
+		unit = proto.GetMemberByRadiusRequest_KM
+	}
+
+	trackerRes, err := muc.trackerRepo.GetMemberByRadius(context.Background(), &proto.GetMemberByRadiusRequest{
+		Longitude: req.Location.Longitude,
+		Latitude:  req.Location.Latitude,
+		Radius:    req.Radius,
+		Unit:      unit,
+	})
+	if err != nil {
+		return nil, err
+	}
+	res.Members = make([]*model.Member, len(trackerRes.Members))
+	for i, v := range trackerRes.Members {
+		res.Members[i] = &model.Member{
+			Location: &model.Location{
+				Latitude:  v.Latitude,
+				Longitude: v.Longitude,
+			},
+			ID: v.PeerId,
+		}
+	}
+	return res, nil
 }
 
 func NewMemberUsecase(

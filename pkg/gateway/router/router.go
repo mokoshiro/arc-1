@@ -63,12 +63,12 @@ func New(ctx context.Context, logger *zap.Logger, opt *option.Option) (*Router, 
 	}
 
 	{
-		// Register
+		// Member
 		lockerRepo := repository.NewLockerRepository(db.RedisPool, 10, int64(100), int64(1), int64(100))
 		metadataRepo := repository.NewMetadataRepository(r.mc)
 		trackerRepo := repository.NewTrackerRepository(r.tc)
 		ruc := usecase.NewRegisterUsecase(metadataRepo, trackerRepo, lockerRepo)
-		handler.RegisterResource(r.engine, ruc, logger)
+		handler.MemberResource(r.engine, ruc, logger)
 	}
 
 	return r, nil

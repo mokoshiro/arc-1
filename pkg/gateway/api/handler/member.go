@@ -9,21 +9,21 @@ import (
 	"go.uber.org/zap"
 )
 
-type RegisterHandler struct {
+type MemberHandler struct {
 	logger     *zap.Logger
 	RegisterUC usecase.RegisterUsecase
 }
 
-func RegisterResource(e *gin.Engine, ruc usecase.RegisterUsecase, logger *zap.Logger) {
-	h := RegisterHandler{RegisterUC: ruc, logger: logger}
-	g := e.Group("/api/register")
+func MemberResource(e *gin.Engine, ruc usecase.RegisterUsecase, logger *zap.Logger) {
+	h := MemberHandler{RegisterUC: ruc, logger: logger}
+	g := e.Group("/api/member")
 	{
-		g.POST("", h.Register)
+		g.POST("/register", h.Register)
 	}
 }
 
 // Register POST /api/register
-func (rh *RegisterHandler) Register(c *gin.Context) {
+func (rh *MemberHandler) Register(c *gin.Context) {
 	req := &model.RegisterRequest{}
 	if err := c.BindJSON(req); err != nil {
 		c.AbortWithError(400, fmt.Errorf("Invalid register request"))

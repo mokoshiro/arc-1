@@ -2,7 +2,7 @@ load("@io_bazel_rules_go//go:def.bzl", "go_library")
 
 go_library(
     name = "go_default_library",
-    srcs = ["register.go"],
+    srcs = ["member.go"],
     importpath = "github.com/Bo0km4n/arc/pkg/gateway/api/handler",
     visibility = ["//visibility:public"],
     deps = [

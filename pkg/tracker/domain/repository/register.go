@@ -14,6 +14,7 @@ type MemberRepository interface {
 	GetMemberByRadius(
 		h3Hash string, longitude,
 		latitude float64, radius float64, unit string) (*proto.GetMemberByRadiusResponse, error)
+	Update(h3Hash, peerID string, longitude, latitude float64) error
 }
 
 type memberKVSRepository struct {
@@ -99,4 +100,14 @@ func (mr *memberKVSRepository) GetMemberByRadius(
 		result[i] = member
 	}
 	return &proto.GetMemberByRadiusResponse{Members: result}, nil
+}
+
+func (mr *memberKVSRepository) Update(h3Hash, peerID string, longitude, latitude float64) error {
+	conn := mr.redisPool.Get()
+	defer conn.Close()
+	if _, err := conn.Do("GEOADD", h3Hash, longitude, latitude, peerID); err != nil {
+		return err
+	}
+	_, err := conn.Do("EXPIRE", h3Hash, option.Opt.RedisKeyExpire)
+	return err
 }

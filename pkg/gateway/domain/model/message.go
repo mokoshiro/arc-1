@@ -26,3 +26,9 @@ type Member struct {
 	Addr     string    `json:"addr"`
 	ID       string    `json:"id"`
 }
+
+type UpdateRequest struct {
+	ID       string    `json:"id"`
+	Location *Location `json:"location"`
+}
+type UpdateResponse struct{}

@@ -8,13 +8,15 @@ import (
 
 	"github.com/Bo0km4n/arc/pkg/gateway/domain/model"
 	"github.com/Bo0km4n/arc/pkg/gateway/domain/repository"
-	"github.com/Bo0km4n/arc/pkg/tracker/api/proto"
 	metaproto "github.com/Bo0km4n/arc/pkg/metadata/api/proto"
+	"github.com/Bo0km4n/arc/pkg/tracker/api/proto"
+	"golang.org/x/xerrors"
 )
 
 type MemberUsecase interface {
 	Register(req *model.RegisterRequest) error
 	GetMemberByRadius(req *model.GetMemberByRadiusRequest) (*model.GetMemberByRadiusResponse, error)
+	Update(req *model.UpdateRequest) (*model.UpdateResponse, error)
 }
 
 type memberUsecase struct {
@@ -114,6 +116,27 @@ func (muc *memberUsecase) GetMemberByRadius(req *model.GetMemberByRadiusRequest)
 	}
 
 	return res, nil
+}
+
+func (mu *memberUsecase) Update(req *model.UpdateRequest) (*model.UpdateResponse, error) {
+	ctx := context.Background()
+	member, err := mu.metadataRepo.GetMember(ctx, &metaproto.GetMemberRequest{
+		PeerIds: []string{req.ID},
+	})
+	if err != nil {
+		return nil, err
+	}
+	if len(member.Members) == 0 {
+		return nil, xerrors.Errorf("Couldn't get key: %s", req.ID)
+	}
+	if _, err := mu.trackerRepo.Update(ctx, &proto.UpdateRequest{
+		PeerId:    req.ID,
+		Longitude: req.Location.Longitude,
+		Latitude:  req.Location.Latitude,
+	}); err != nil {
+		return nil, err
+	}
+	return &model.UpdateResponse{}, nil
 }
 
 func NewMemberUsecase(

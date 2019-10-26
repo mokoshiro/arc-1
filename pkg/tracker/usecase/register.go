@@ -19,6 +19,7 @@ import (
 type MemberUsecase interface {
 	Register(req *proto.RegisterRequest) error
 	GetMemberByRadius(ctx context.Context, req *proto.GetMemberByRadiusRequest) (*proto.GetMemberByRadiusResponse, error)
+	Update(ctx context.Context, req *proto.UpdateRequest) (*proto.UpdateResponse, error)
 }
 
 type memberUsecase struct {
@@ -83,6 +84,18 @@ func (ru *memberUsecase) invokeH3(resolution int, longitude, latitude float64) (
 	}
 	result := strings.TrimRight(string(b), "\n")
 	return result, err
+}
+
+func (mu *memberUsecase) Update(ctx context.Context, req *proto.UpdateRequest) (*proto.UpdateResponse, error) {
+	hashStr, err := mu.invokeH3(option.Opt.GeoResolution, req.Longitude, req.Latitude)
+	if err != nil {
+		logger.L.Error(err.Error())
+		return nil, err
+	}
+	if err := mu.mr.Update(hashStr, req.PeerId, req.Longitude, req.Latitude); err != nil {
+		return nil, err
+	}
+	return &proto.UpdateResponse{}, nil
 }
 
 func NewMemberUsecase(mr repository.MemberRepository) MemberUsecase {

@@ -46,6 +46,13 @@ func (rr *memberKVSRepository) Register(peerID string, addr string) error {
 func (mr *memberKVSRepository) GetMember(ctx context.Context, peerIDs []string) ([]string, error) {
 	conn := mr.redisPool.Get()
 	defer conn.Close()
+	if len(peerIDs) == 1 {
+		res, err := redis.String(conn.Do("GET", peerIDs[0]))
+		if err != nil {
+			return []string{}, err
+		}
+		return []string{res}, nil
+	}
 	args := make([]interface{}, len(peerIDs))
 	for i := range peerIDs {
 		args[i] = peerIDs[i]

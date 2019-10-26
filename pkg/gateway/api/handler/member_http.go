@@ -20,6 +20,7 @@ func MemberResource(e *gin.Engine, muc usecase.MemberUsecase, logger *zap.Logger
 	{
 		g.POST("/register", h.Register)
 		g.GET("", h.GetMemberByRadius)
+		g.PUT("", h.Update)
 	}
 }
 
@@ -46,7 +47,21 @@ func (mh *MemberHandler) GetMemberByRadius(c *gin.Context) {
 	}
 	res, err := mh.MemberUC.GetMemberByRadius(req)
 	if err != nil {
-		c.AbortWithError(503, err)
+		c.AbortWithError(404, err)
+		return
+	}
+	c.JSON(200, res)
+}
+
+func (mh *MemberHandler) Update(c *gin.Context) {
+	req := &model.UpdateRequest{}
+	if err := c.BindJSON(req); err != nil {
+		c.AbortWithError(400, fmt.Errorf("Invalid update request"))
+		return
+	}
+	res, err := mh.MemberUC.Update(req)
+	if err != nil {
+		c.AbortWithError(404, err)
 		return
 	}
 	c.JSON(200, res)

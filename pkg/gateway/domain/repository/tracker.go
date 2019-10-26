@@ -11,6 +11,7 @@ import (
 type TrackerRepository interface {
 	Register(ctx context.Context, peerID string, latitude, longitude float64) error
 	GetMemberByRadius(ctx context.Context, req *proto.GetMemberByRadiusRequest) (*proto.GetMemberByRadiusResponse, error)
+	Update(ctx context.Context, req *proto.UpdateRequest) (*proto.UpdateResponse, error)
 }
 
 type trackerRepository struct {
@@ -31,6 +32,10 @@ func (tr *trackerRepository) Register(ctx context.Context, peerID string, latitu
 
 func (tr *trackerRepository) GetMemberByRadius(ctx context.Context, req *proto.GetMemberByRadiusRequest) (*proto.GetMemberByRadiusResponse, error) {
 	return tr.Client.GetMemberByRadius(ctx, req)
+}
+
+func (tr *trackerRepository) Update(ctx context.Context, req *proto.UpdateRequest) (*proto.UpdateResponse, error) {
+	return tr.Client.Update(ctx, req)
 }
 
 func NewTrackerRepository(trackerClient trackerclient.Client) TrackerRepository {

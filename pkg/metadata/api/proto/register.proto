@@ -5,6 +5,7 @@ package proto;
 service Metadata {
     rpc Register(RegisterRequest) returns (RegisterResponse) {}
     rpc GetMember(GetMemberRequest) returns (GetMemberResponse) {}
+    rpc Delete(DeleteRequest) returns (DeleteResponse) {}
 }
 
 message RegisterRequest {
@@ -26,4 +27,12 @@ message GetMemberResponse {
 message MetadataMember {
     string peer_id = 1;
     string addr = 2;
+}
+
+message DeleteRequest {
+    string peer_id = 1;
+}
+
+message DeleteResponse {
+    
 }

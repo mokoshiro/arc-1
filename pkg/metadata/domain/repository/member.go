@@ -11,6 +11,7 @@ import (
 type MemberRepository interface {
 	Register(peerID, addr string) error
 	GetMember(ctx context.Context, peerIDs []string) ([]string, error)
+	Delete(ctx context.Context, peerID string) error
 }
 
 type memberKVSRepository struct {
@@ -58,4 +59,13 @@ func (mr *memberKVSRepository) GetMember(ctx context.Context, peerIDs []string) 
 		args[i] = peerIDs[i]
 	}
 	return redis.Strings(conn.Do("MGET", args...))
+}
+
+func (mr *memberKVSRepository) Delete(ctx context.Context, peerID string) error {
+	conn := mr.redisPool.Get()
+	defer conn.Close()
+	if _, err := conn.Do("DEL", peerID); err != nil {
+		return err
+	}
+	return nil
 }

@@ -17,6 +17,7 @@ type MemberUsecase interface {
 	Register(req *model.RegisterRequest) error
 	GetMemberByRadius(req *model.GetMemberByRadiusRequest) (*model.GetMemberByRadiusResponse, error)
 	Update(req *model.UpdateRequest) (*model.UpdateResponse, error)
+	Delete(req *model.DeleteRequest) (*model.DeleteResponse, error)
 }
 
 type memberUsecase struct {
@@ -137,6 +138,41 @@ func (mu *memberUsecase) Update(req *model.UpdateRequest) (*model.UpdateResponse
 		return nil, err
 	}
 	return &model.UpdateResponse{}, nil
+}
+
+func (mu *memberUsecase) Delete(req *model.DeleteRequest) (*model.DeleteResponse, error) {
+	ctx, cancel := context.WithTimeout(context.Background(), 100*time.Millisecond)
+	defer cancel()
+	done := make(chan error, 1)
+
+	// Get lock
+	go func() {
+		err := mu.lockerRepo.Lock(ctx, req.ID)
+		if err != nil {
+			done <- err
+		}
+		done <- nil
+	}()
+
+	select {
+	case e := <-done:
+		if e != nil {
+			return nil, e
+		}
+		break
+	case <-ctx.Done():
+		return nil, errors.New("Timeout get lock of a key")
+	}
+	defer mu.lockerRepo.Unlock(ctx, req.ID)
+
+	if _, err := mu.metadataRepo.Delete(ctx, &metaproto.DeleteRequest{
+		PeerId: req.ID,
+	}); err != nil {
+		return nil, err
+	}
+	return &model.DeleteResponse{}, nil
+
+	// TODO: Delete member from Tracker
 }
 
 func NewMemberUsecase(

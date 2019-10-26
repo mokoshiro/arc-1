@@ -12,6 +12,7 @@ import (
 type MemberUsecase interface {
 	Register(peerID, addr string) error
 	GetMember(ctx context.Context, req *proto.GetMemberRequest) (*proto.GetMemberResponse, error)
+	Delete(ctx context.Context, req *proto.DeleteRequest) (*proto.DeleteResponse, error)
 }
 
 type memberUsecase struct {
@@ -40,6 +41,13 @@ func (mu *memberUsecase) GetMember(ctx context.Context, req *proto.GetMemberRequ
 		}
 	}
 	return res, nil
+}
+
+func (mu *memberUsecase) Delete(ctx context.Context, req *proto.DeleteRequest) (*proto.DeleteResponse, error) {
+	if err := mu.mr.Delete(ctx, req.PeerId); err != nil {
+		return nil, err
+	}
+	return &proto.DeleteResponse{}, nil
 }
 
 func NewMemberUsecase(mr repository.MemberRepository) MemberUsecase {

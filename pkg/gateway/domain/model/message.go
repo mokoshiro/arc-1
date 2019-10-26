@@ -32,3 +32,9 @@ type UpdateRequest struct {
 	Location *Location `json:"location"`
 }
 type UpdateResponse struct{}
+
+type DeleteRequest struct {
+	ID string `json:"id"`
+}
+
+type DeleteResponse struct{}

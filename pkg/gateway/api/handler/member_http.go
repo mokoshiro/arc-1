@@ -21,6 +21,7 @@ func MemberResource(e *gin.Engine, muc usecase.MemberUsecase, logger *zap.Logger
 		g.POST("/register", h.Register)
 		g.GET("", h.GetMemberByRadius)
 		g.PUT("", h.Update)
+		g.DELETE("", h.Delete)
 	}
 }
 
@@ -60,6 +61,20 @@ func (mh *MemberHandler) Update(c *gin.Context) {
 		return
 	}
 	res, err := mh.MemberUC.Update(req)
+	if err != nil {
+		c.AbortWithError(404, err)
+		return
+	}
+	c.JSON(200, res)
+}
+
+func (mh *MemberHandler) Delete(c *gin.Context) {
+	req := &model.DeleteRequest{}
+	if err := c.BindJSON(req); err != nil {
+		c.AbortWithError(400, fmt.Errorf("Invalid delete request"))
+		return
+	}
+	res, err := mh.MemberUC.Delete(req)
 	if err != nil {
 		c.AbortWithError(404, err)
 		return

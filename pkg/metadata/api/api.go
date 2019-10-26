@@ -31,6 +31,10 @@ func (api *metadataAPI) GetMember(ctx context.Context, req *proto.GetMemberReque
 	return api.memberUC.GetMember(ctx, req)
 }
 
+func (api *metadataAPI) Delete(ctx context.Context, req *proto.DeleteRequest) (*proto.DeleteResponse, error) {
+	return api.memberUC.Delete(ctx, req)
+}
+
 func (api *metadataAPI) Embed(server *grpc.Server, logger *zap.Logger) {
 	api.logger = logger
 	proto.RegisterMetadataServer(server, api)

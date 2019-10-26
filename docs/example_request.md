@@ -28,3 +28,16 @@ curl -X GET 'http://localhost:8080/api/member?longitude=63.000&latitude=130.0000
 ```
 
 `unit` takes a some case such as `m | km | ft | mi`
+
+
+### Update Member location
+
+```
+curl -X PUT 'http://localhost:8080/api/member' -d '{"location": {"longitude": 125.77777, "latitude": 35.656565}, "id": "popo"}'
+```
+
+### Delete Member
+
+```
+curl -X DELETE 'http://localhost:8080/api/member' -d '{"id": "popo"}'
+```

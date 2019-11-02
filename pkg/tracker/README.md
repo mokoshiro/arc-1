@@ -29,6 +29,27 @@ Tracking, SignalingにおけるすべてのClient-Server間の通信は
 | latitude | decimal(8,6) | 緯度 |
 | longitude | decimal(9,6)| 経度 |
 
+*メッセージフォーマット*
+
+| Message ID | Size | Description |
+| :-:        | :-:  |   :-:       |
+| Message Type | 2 bytes  | メッセージの種類(65536) |
+| Payload Length | 2 bytes| ペイロードの長さ |
+| Payload | N bytes | メッセージ本体 |
+
+*メッセージタイプ*
+
+| Message Type | Description |
+| :-: | :-: |
+| 0x0000 | None(未使用) |
+| 0x0001 | Greet: コネクション確立 |
+| 0x0002 | Ping: 生存確認 |
+| 0x0003 | Pong: 生存確認Ack |
+| 0x0004 | Tracking: 位置情報更新 |
+| 0x0005 | LookUp: Peer情報取得 |
+| 0x0006 | Signaling Request |
+| 0x0007 | Signaling Response |
+
 
 #### コネクション確立
 1. WebSocketでClientを待ち受ける

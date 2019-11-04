@@ -1,13 +1,13 @@
 package socket
 
 import (
-	"bytes"
 	"encoding/binary"
+	"encoding/json"
 	"errors"
 )
 
 type Message interface {
-	Marshal([]byte) error
+	Unmarshal([]byte) error
 	Raw() []byte
 }
 
@@ -16,47 +16,46 @@ type Response interface {
 }
 
 type greetMessage struct {
-	peerID    string
-	mode      int
-	addr      string
-	longitude float64
-	latitude  float64
+	peerID    string  `json:"peer_id"`
+	mode      int     `json:"mode"`
+	addr      string  `json:"addr"`
+	longitude float64 `json:"longitude"`
+	latitude  float64 `json:"latitude"`
 }
 
 type greetResponse struct {
-	Status int
+	Status int `json:"status"`
 }
 
 func (m *greetMessage) Raw() []byte {
-	buf := &bytes.Buffer{}
-	if err := binary.Write(buf, binary.BigEndian, &m); err != nil {
+	b, err := json.Marshal(m)
+	if err != nil {
 		return nil
 	}
-	return buf.Bytes()
+	return b
 }
 
-func (m *greetMessage) Marshal(b []byte) error {
-	reader := bytes.NewReader(b)
-	return binary.Read(reader, binary.BigEndian, m)
+func (m *greetMessage) Unmarshal(b []byte) error {
+	return json.Unmarshal(b, m)
 }
 
 func (m *greetResponse) Raw() []byte {
-	buf := &bytes.Buffer{}
-	if err := binary.Write(buf, binary.BigEndian, &m); err != nil {
+	b, err := json.Marshal(m)
+	if err != nil {
 		return nil
 	}
-	return buf.Bytes()
+	return b
 }
 
 func handleMessage(body []byte) (Response, error) {
 	var messageType uint16
-	binary.BigEndian.PutUint16(body[0:2], messageType)
+	messageType = binary.BigEndian.Uint16(body[0:2])
 	switch messageType {
 	case 0:
 		return nil, errors.New("Unimplemented message type: 0")
 	case 1:
 		gm := &greetMessage{}
-		if err := gm.Marshal(body[4:]); err != nil {
+		if err := gm.Unmarshal(body[4:]); err != nil {
 			return nil, err
 		}
 		return &greetResponse{Status: 1}, nil

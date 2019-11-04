@@ -10,6 +10,7 @@ import (
 )
 
 var upgrader = websocket.Upgrader{}
+var conns = map[string]*Sock{}
 
 const (
 	writeWait      = 10 * time.Second

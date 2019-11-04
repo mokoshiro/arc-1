@@ -347,7 +347,7 @@ go_repository(
 
 go_repository(
     name = "in_gopkg_check_v1",
-    commit = "20d25e280405",
+    commit = "41f04d3bba15",
     importpath = "gopkg.in/check.v1",
 )
 
@@ -366,7 +366,7 @@ go_repository(
 go_repository(
     name = "in_gopkg_yaml_v2",
     importpath = "gopkg.in/yaml.v2",
-    tag = "v2.2.2",
+    tag = "v2.2.4",
 )
 
 go_repository(

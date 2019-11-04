@@ -878,3 +878,9 @@ go_repository(
     importpath = "github.com/mattn/go-colorable",
     tag = "v0.1.4",
 )
+
+go_repository(
+    name = "com_github_gorilla_websocket",
+    importpath = "github.com/gorilla/websocket",
+    tag = "v1.4.1",
+)

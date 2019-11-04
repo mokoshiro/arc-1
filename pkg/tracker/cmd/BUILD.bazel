@@ -15,6 +15,7 @@ go_library(
         "//pkg/tracker/domain/repository:go_default_library",
         "//pkg/tracker/infra/db:go_default_library",
         "//pkg/tracker/logger:go_default_library",
+        "//pkg/tracker/socket:go_default_library",
         "//pkg/tracker/usecase:go_default_library",
         "@com_github_spf13_cobra//:go_default_library",
     ],

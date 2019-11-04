@@ -2,6 +2,9 @@ package cmd
 
 import (
 	"context"
+	"log"
+
+	"net/http"
 
 	"github.com/Bo0km4n/arc/internal/rpc"
 	"github.com/Bo0km4n/arc/pkg/tracker/api"
@@ -9,6 +12,7 @@ import (
 	"github.com/Bo0km4n/arc/pkg/tracker/domain/repository"
 	"github.com/Bo0km4n/arc/pkg/tracker/infra/db"
 	"github.com/Bo0km4n/arc/pkg/tracker/logger"
+	"github.com/Bo0km4n/arc/pkg/tracker/socket"
 	"github.com/Bo0km4n/arc/pkg/tracker/usecase"
 	"github.com/spf13/cobra"
 )
@@ -28,6 +32,7 @@ var serverCmd = &cobra.Command{
 
 func init() {
 	rootCmd.AddCommand(serverCmd)
+	serverCmd.Flags().BoolVarP(&option.Opt.Ws, "ws", "", true, "use websockets")
 	serverCmd.Flags().IntVarP(&option.Opt.Port, "port", "p", 50051, "listen port")
 	serverCmd.Flags().BoolVarP(&option.Opt.UseRedis, "use_redis", "", true, "use redis")
 	serverCmd.Flags().StringVarP(&option.Opt.RedisHost, "redis_host", "", "127.0.0.1:6379", "redis host address")
@@ -36,22 +41,32 @@ func init() {
 	serverCmd.Flags().IntVarP(&option.Opt.RedisIdleTimeout, "redis_idle_timeout", "", 240, "redis idle timeout connection")
 	serverCmd.Flags().IntVarP(&option.Opt.RedisKeyExpire, "redis_key_expire", "", 86400, "redis key expire")
 	serverCmd.Flags().IntVarP(&option.Opt.GeoResolution, "geo_resolution", "", 9, "Geo hash resolution")
+	serverCmd.Flags().StringVarP(&option.Opt.MysqlHost, "mysql_host", "", "127.0.0.1:3306", "mysql host address")
+
 }
 
 // Server returns API object
-func Server(ctx context.Context) error {
+func Server(ctx context.Context) {
 	memberRepo := repository.NewMemberRepository(db.DB_REDIS)
 	memberUsecase := usecase.NewMemberUsecase(memberRepo)
 	trackerAPI := api.NewtrackerAPI(memberUsecase)
 
-	server := rpc.NewServer(trackerAPI, rpc.WithPort(option.Opt.Port))
-	defer func() {
-		server.Stop(10)
-		logger.Destruction()
-	}()
-	go server.Run()
+	if !option.Opt.Ws {
+		server := rpc.NewServer(trackerAPI, rpc.WithPort(option.Opt.Port))
+		defer func() {
+			server.Stop(10)
+			logger.Destruction()
+		}()
+		go server.Run()
 
-	// Waiting the signals
-	<-ctx.Done()
-	return nil
+		// Waiting the signals
+		<-ctx.Done()
+	} else {
+		http.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
+			socket.Serve(w, r)
+		})
+		if err := http.ListenAndServe(":8080", nil); err != nil {
+			log.Fatal(err)
+		}
+	}
 }

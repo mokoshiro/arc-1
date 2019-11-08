@@ -6,8 +6,6 @@ import (
 	"errors"
 )
 
-var ()
-
 type Message interface {
 	Unmarshal([]byte) error
 	Raw() []byte
@@ -26,6 +24,16 @@ type greetMessage struct {
 }
 
 type greetResponse struct {
+	Status int `json:"status"`
+}
+
+type trackingMessage struct {
+	peerID    string  `json:"peer_id"`
+	longitude float64 `json:"longitude"`
+	latitude  float64 `json:"latitude"`
+}
+
+type trackingResponse struct {
 	Status int `json:"status"`
 }
 
@@ -49,6 +57,26 @@ func (m *greetResponse) Raw() []byte {
 	return b
 }
 
+func (m *trackingMessage) Raw() []byte {
+	b, err := json.Marshal(m)
+	if err != nil {
+		return nil
+	}
+	return b
+}
+
+func (m *trackingMessage) Unmarshal(b []byte) error {
+	return json.Unmarshal(b, m)
+}
+
+func (m *trackingResponse) Raw() []byte {
+	b, err := json.Marshal(m)
+	if err != nil {
+		return nil
+	}
+	return b
+}
+
 func handleMessage(body []byte) (Response, error) {
 	var messageType uint16
 	messageType = binary.BigEndian.Uint16(body[0:2])
@@ -65,6 +93,12 @@ func handleMessage(body []byte) (Response, error) {
 			return nil, err
 		}
 		return &greetResponse{Status: 1}, nil
+	case 2:
+		tm := &trackingMessage{}
+		if err := tm.Unmarshal(body[4:]); err != nil {
+			return nil, err
+		}
+		return &trackingResponse{Status: 1}, nil
 	}
 	return nil, nil
 }

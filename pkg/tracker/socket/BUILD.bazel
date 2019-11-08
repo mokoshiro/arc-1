@@ -3,12 +3,16 @@ load("@io_bazel_rules_go//go:def.bzl", "go_library", "go_test")
 go_library(
     name = "go_default_library",
     srcs = [
+        "const.go",
+        "handler.go",
         "message.go",
         "socket.go",
     ],
     importpath = "github.com/Bo0km4n/arc/pkg/tracker/socket",
     visibility = ["//visibility:public"],
     deps = [
+        "//pkg/tracker/h3:go_default_library",
+        "//pkg/tracker/infra/db:go_default_library",
         "//pkg/tracker/logger:go_default_library",
         "@com_github_gorilla_websocket//:go_default_library",
     ],

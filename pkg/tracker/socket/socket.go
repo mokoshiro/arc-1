@@ -9,17 +9,6 @@ import (
 	"github.com/gorilla/websocket"
 )
 
-var upgrader = websocket.Upgrader{}
-var conns = map[string]*Sock{}
-
-const (
-	writeWait      = 10 * time.Second
-	readLimit      = 60 * time.Second
-	maxMessageSize = 512
-	pongWait       = 60 * time.Second
-	pingPeriod     = 10 * time.Second
-)
-
 type Sock struct {
 	ws         *websocket.Conn
 	writeQueue chan []byte

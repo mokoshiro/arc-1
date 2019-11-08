@@ -6,6 +6,8 @@ import (
 	"errors"
 )
 
+var ()
+
 type Message interface {
 	Unmarshal([]byte) error
 	Raw() []byte
@@ -59,7 +61,9 @@ func handleMessage(body []byte) (Response, error) {
 			return nil, err
 		}
 
-		// TODO: Write record to mysql and redis
+		if err := greet(gm); err != nil {
+			return nil, err
+		}
 		return &greetResponse{Status: 1}, nil
 	}
 	return nil, nil

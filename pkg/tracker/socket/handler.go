@@ -29,3 +29,16 @@ func greet(m *greetMessage) error {
 	}
 	return nil
 }
+
+func tracking(m *trackingMessage) error {
+	statement := fmt.Sprintf("UPDATE peer SET latitude = ?, longitude = ? WHERE peer_id = ?")
+	stmt, err := db.MysqlPool.Prepare(statement)
+	if err != nil {
+		return err
+	}
+	_, err = stmt.Exec(m.latitude, m.longitude, m.peerID)
+	if err != nil {
+		return err
+	}
+	return nil
+}

@@ -884,3 +884,9 @@ go_repository(
     importpath = "github.com/gorilla/websocket",
     tag = "v1.4.1",
 )
+
+go_repository(
+    name = "com_github_go_sql_driver_mysql",
+    importpath = "github.com/go-sql-driver/mysql",
+    tag = "v1.4.1",
+)

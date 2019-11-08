@@ -10,6 +10,10 @@ type Option struct {
 	RedisIdleTimeout  int // second
 	RedisKeyExpire    int // second
 	MysqlHost         string
+	MysqlPort         string
+	MysqlUser         string
+	MysqlPassword     string
+	MysqlDatabase     string
 	MysqlMaxOpenConns int
 	MysqlMaxIdleConns int
 	GeoResolution     int

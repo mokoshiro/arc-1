@@ -14,6 +14,7 @@ var (
 func InitDB() {
 	if option.Opt.UseRedis {
 		InitRedisPool()
+		InitMysql()
 	}
 }
 

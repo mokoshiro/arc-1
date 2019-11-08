@@ -58,6 +58,8 @@ func handleMessage(body []byte) (Response, error) {
 		if err := gm.Unmarshal(body[4:]); err != nil {
 			return nil, err
 		}
+
+		// TODO: Write record to mysql and redis
 		return &greetResponse{Status: 1}, nil
 	}
 	return nil, nil

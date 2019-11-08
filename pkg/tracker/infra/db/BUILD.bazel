@@ -4,6 +4,7 @@ go_library(
     name = "go_default_library",
     srcs = [
         "entity.go",
+        "mysql.go",
         "redis.go",
     ],
     importpath = "github.com/Bo0km4n/arc/pkg/tracker/infra/db",
@@ -11,5 +12,6 @@ go_library(
     deps = [
         "//pkg/tracker/cmd/option:go_default_library",
         "@com_github_garyburd_redigo//redis:go_default_library",
+        "@com_github_go_sql_driver_mysql//:go_default_library",
     ],
 )

@@ -8,8 +8,8 @@ import (
 )
 
 func greet(m *greetMessage) error {
-	statement := fmt.Sprintf("INSERT INTO peer(peer_id, h3_hash, h3_resolution, latitude, longitude) VALUES (?, ?, ?, ?, ?)")
-
+	statement := fmt.Sprintf("INSERT INTO peer(peer_id, h3_hash, h3_resolution, point) VALUES (?, ?, ?, ?)")
+	pointValue := fmt.Sprintf(`ST_GeomFromText('POINT(%f %f)')`, m.longitude, m.latitude)
 	ins, err := db.MysqlPool.Prepare(statement)
 	if err != nil {
 		return err
@@ -18,7 +18,7 @@ func greet(m *greetMessage) error {
 	if err != nil {
 		return err
 	}
-	_, err = ins.Exec(m.peerID, hash, 14, m.latitude, m.longitude)
+	_, err = ins.Exec(m.peerID, hash, 14, pointValue)
 	if err != nil {
 		return err
 	}
@@ -31,12 +31,13 @@ func greet(m *greetMessage) error {
 }
 
 func tracking(m *trackingMessage) error {
-	statement := fmt.Sprintf("UPDATE peer SET latitude = ?, longitude = ? WHERE peer_id = ?")
+	statement := fmt.Sprintf("UPDATE peer SET point = ? WHERE peer_id = ?")
+	pointValue := fmt.Sprintf(`ST_GeomFromText('POINT(%f %f)')`, m.longitude, m.latitude)
 	stmt, err := db.MysqlPool.Prepare(statement)
 	if err != nil {
 		return err
 	}
-	_, err = stmt.Exec(m.latitude, m.longitude, m.peerID)
+	_, err = stmt.Exec(pointValue, m.peerID)
 	if err != nil {
 		return err
 	}

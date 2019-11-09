@@ -98,6 +98,9 @@ func handleMessage(body []byte) (Response, error) {
 		if err := tm.Unmarshal(body[4:]); err != nil {
 			return nil, err
 		}
+		if err := tracking(tm); err != nil {
+			return nil, err
+		}
 		return &trackingResponse{Status: 1}, nil
 	}
 	return nil, nil

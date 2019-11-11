@@ -13,6 +13,7 @@ require (
 	github.com/mattn/go-isatty v0.0.8 // indirect
 	github.com/spf13/cobra v0.0.5
 	github.com/stretchr/testify v1.4.0
+	github.com/ugorji/go v1.1.7 // indirect
 	go.opencensus.io v0.22.1
 	go.uber.org/zap v1.10.0
 	golang.org/x/xerrors v0.0.0-20191011141410-1b5146add898

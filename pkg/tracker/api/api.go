@@ -1,45 +1,85 @@
 package api
 
 import (
-	"context"
+	"log"
 
-	"github.com/Bo0km4n/arc/pkg/tracker/api/proto"
-	"github.com/Bo0km4n/arc/pkg/tracker/usecase"
+	"github.com/Bo0km4n/arc/pkg/tracker/msg"
+	"github.com/Bo0km4n/arc/pkg/tracker/socket"
+	"github.com/gin-gonic/gin"
 	"go.uber.org/zap"
-	"google.golang.org/grpc"
 )
 
 type trackerAPI struct {
-	logger   *zap.Logger
-	memberUC usecase.MemberUsecase
+	logger *zap.Logger
 }
 
-func NewtrackerAPI(ruc usecase.MemberUsecase) *trackerAPI {
-	return &trackerAPI{
-		memberUC: ruc,
+type trackerHTTPAPI struct {
+}
+
+func NewGRPCTrackerAPI() *trackerAPI {
+	return &trackerAPI{}
+}
+
+func NewHTTPTrackerAPI() *trackerHTTPAPI {
+	return &trackerHTTPAPI{}
+}
+
+func (a *trackerHTTPAPI) Run() {
+	e := gin.Default()
+	e.POST(
+		"/api/member", a.Register,
+	)
+	e.GET(
+		"/api/member", a.LookupMembers,
+	)
+	e.PUT(
+		"/api/member", a.PutMember,
+	)
+	e.Run(":8000")
+}
+
+func (a *trackerHTTPAPI) Register(c *gin.Context) {
+	m := &msg.GreetMessage{}
+	if err := c.BindJSON(m); err != nil {
+		log.Println(err)
+		c.AbortWithError(400, err)
+		return
 	}
-}
-
-func (api *trackerAPI) Register(ctx context.Context, req *proto.RegisterRequest) (*proto.RegisterResponse, error) {
-	if err := api.memberUC.Register(req); err != nil {
-		return nil, err
+	if err := socket.Greet(m); err != nil {
+		log.Println(err)
+		c.AbortWithError(400, err)
+		return
 	}
-	return &proto.RegisterResponse{}, nil
+	c.JSON(200, gin.H{"status": "ok"})
 }
 
-func (api *trackerAPI) GetMemberByRadius(ctx context.Context, req *proto.GetMemberByRadiusRequest) (*proto.GetMemberByRadiusResponse, error) {
-	res, err := api.memberUC.GetMemberByRadius(ctx, req)
+func (a *trackerHTTPAPI) LookupMembers(c *gin.Context) {
+	m := &msg.LookupRequest{}
+	if err := c.BindJSON(m); err != nil {
+		log.Println(err)
+		c.AbortWithError(400, err)
+		return
+	}
+	res, err := socket.Lookup(m)
 	if err != nil {
-		return nil, err
+		log.Println(err)
+		c.AbortWithError(404, err)
+		return
 	}
-	return res, nil
+	c.JSON(200, res)
 }
 
-func (api *trackerAPI) Update(ctx context.Context, req *proto.UpdateRequest) (*proto.UpdateResponse, error) {
-	return api.memberUC.Update(ctx, req)
-}
-
-func (api *trackerAPI) Embed(server *grpc.Server, logger *zap.Logger) {
-	api.logger = logger
-	proto.RegisterTrackerServer(server, api)
+func (a *trackerHTTPAPI) PutMember(c *gin.Context) {
+	m := &msg.TrackingMessage{}
+	if err := c.BindJSON(m); err != nil {
+		log.Println(err)
+		c.AbortWithError(400, err)
+		return
+	}
+	if err := socket.Tracking(m); err != nil {
+		log.Println(err)
+		c.AbortWithError(400, err)
+		return
+	}
+	c.JSON(200, gin.H{"status": "ok"})
 }

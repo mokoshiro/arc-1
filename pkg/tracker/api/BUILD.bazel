@@ -6,9 +6,9 @@ go_library(
     importpath = "github.com/Bo0km4n/arc/pkg/tracker/api",
     visibility = ["//visibility:public"],
     deps = [
-        "//pkg/tracker/api/proto:go_default_library",
-        "//pkg/tracker/usecase:go_default_library",
-        "@org_golang_google_grpc//:go_default_library",
+        "//pkg/tracker/msg:go_default_library",
+        "//pkg/tracker/socket:go_default_library",
+        "@com_github_gin_gonic_gin//:go_default_library",
         "@org_uber_go_zap//:go_default_library",
     ],
 )

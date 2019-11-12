@@ -1,11 +1,14 @@
 package socket
 
 import (
+	"encoding/binary"
+	"errors"
 	"net/http"
 
 	"time"
 
 	"github.com/Bo0km4n/arc/pkg/tracker/logger"
+	"github.com/Bo0km4n/arc/pkg/tracker/msg"
 	"github.com/gorilla/websocket"
 )
 
@@ -90,4 +93,33 @@ func (s *Sock) writePump() {
 			}
 		}
 	}
+}
+
+func handleMessage(body []byte) (msg.Response, error) {
+	var messageType uint16
+	messageType = binary.BigEndian.Uint16(body[0:2])
+	switch messageType {
+	case 0:
+		return nil, errors.New("Unimplemented message type: 0")
+	case 1:
+		gm := &msg.GreetMessage{}
+		if err := gm.Unmarshal(body[4:]); err != nil {
+			return nil, err
+		}
+
+		if err := Greet(gm); err != nil {
+			return nil, err
+		}
+		return &msg.GreetResponse{Status: 1}, nil
+	case 2:
+		tm := &msg.TrackingMessage{}
+		if err := tm.Unmarshal(body[4:]); err != nil {
+			return nil, err
+		}
+		if err := Tracking(tm); err != nil {
+			return nil, err
+		}
+		return &msg.TrackingResponse{Status: 1}, nil
+	}
+	return nil, nil
 }

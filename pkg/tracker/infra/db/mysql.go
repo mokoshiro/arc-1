@@ -27,6 +27,9 @@ func InitMysql() {
 	if err != nil {
 		log.Fatal(err)
 	}
+	if c == nil {
+		log.Fatalf("Failed connect to mysql, url=%s", url)
+	}
 	c.SetMaxIdleConns(option.Opt.MysqlMaxIdleConns)
 	c.SetMaxOpenConns(option.Opt.MysqlMaxOpenConns)
 

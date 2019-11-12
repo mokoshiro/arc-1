@@ -6,4 +6,3 @@ infra/local/data/
 /bazel-out
 /bazel-testlogs
 /vendor
-*.pb.go

@@ -330,13 +330,13 @@ go_repository(
 go_repository(
     name = "com_github_ugorji_go",
     importpath = "github.com/ugorji/go",
-    tag = "v1.1.4",
+    tag = "v1.1.7",
 )
 
 go_repository(
     name = "com_github_ugorji_go_codec",
-    commit = "d75b2dcb6bc8",
     importpath = "github.com/ugorji/go/codec",
+    tag = "v1.1.7",
 )
 
 go_repository(

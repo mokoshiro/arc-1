@@ -54,7 +54,7 @@ curl -X DELETE 'http://localhost:8080/api/member' -d '{"id": "popo"}'
 ### Signaling Request
 
 ```
-curl -X POST 'http://localhost:8000/api/signaling' -d \
+curl -X POST 'http://localhost:8000/api/room/notification' -d \
 '{
   "peers": [
     "aaaa",
@@ -65,3 +65,4 @@ curl -X POST 'http://localhost:8000/api/signaling' -d \
 }
 '
 ```
+

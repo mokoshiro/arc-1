@@ -35,6 +35,12 @@ func (a *trackerHTTPAPI) Run() {
 	e.PUT(
 		"/api/member", a.PutMember,
 	)
+	e.POST(
+		"/api/signaling", a.Signaling,
+	)
+	e.POST(
+		"/api/signaling/peer/status", a.PingPeerStatus,
+	)
 	e.Run(":8000")
 }
 
@@ -82,4 +88,24 @@ func (a *trackerHTTPAPI) PutMember(c *gin.Context) {
 		return
 	}
 	c.JSON(200, gin.H{"status": "ok"})
+}
+
+func (a *trackerHTTPAPI) Signaling(c *gin.Context) {
+	m := &msg.SignalingRequest{}
+	if err := c.BindJSON(m); err != nil {
+		log.Println(err)
+		c.AbortWithError(400, err)
+		return
+	}
+	res, err := socket.Signaling(m)
+	if err != nil {
+		log.Println(err)
+		c.AbortWithError(404, err)
+		return
+	}
+	c.JSON(200, res)
+}
+
+func (a *trackerHTTPAPI) PingPeerStatus(c *gin.Context) {
+
 }

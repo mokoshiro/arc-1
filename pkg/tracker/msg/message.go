@@ -111,3 +111,59 @@ func (m *LookupResponse) Raw() []byte {
 	}
 	return b
 }
+
+type SignalingRequest struct {
+	Peers []string `json:"peers"`
+}
+
+type SignalingResponse struct {
+	PeerStatus map[string]int `json:"peer_status"`
+}
+
+func (m *SignalingRequest) Raw() []byte {
+	b, err := json.Marshal(m)
+	if err != nil {
+		return nil
+	}
+	return b
+}
+
+func (m *SignalingRequest) Unmarshal(b []byte) error {
+	return json.Unmarshal(b, m)
+}
+
+func (m *SignalingResponse) Raw() []byte {
+	b, err := json.Marshal(m)
+	if err != nil {
+		return nil
+	}
+	return b
+}
+
+type PingPeerStatusRequest struct {
+	Peers []string `json:"peers"`
+}
+
+type PingPeerStatusResponse struct {
+	PeerStatus map[string]int `json:"peer_status"`
+}
+
+func (m *PingPeerStatusRequest) Raw() []byte {
+	b, err := json.Marshal(m)
+	if err != nil {
+		return nil
+	}
+	return b
+}
+
+func (m *PingPeerStatusRequest) Unmarshal(b []byte) error {
+	return json.Unmarshal(b, m)
+}
+
+func (m *PingPeerStatusResponse) Raw() []byte {
+	b, err := json.Marshal(m)
+	if err != nil {
+		return nil
+	}
+	return b
+}

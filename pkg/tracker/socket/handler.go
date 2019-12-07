@@ -10,6 +10,7 @@ import (
 	"github.com/Bo0km4n/arc/pkg/tracker/h3"
 	"github.com/Bo0km4n/arc/pkg/tracker/infra/db"
 	"github.com/Bo0km4n/arc/pkg/tracker/msg"
+	"github.com/garyburd/redigo/redis"
 )
 
 func Greet(m *msg.GreetMessage) error {
@@ -85,6 +86,22 @@ func Lookup(m *msg.LookupRequest) (*msg.LookupResponse, error) {
 	}
 
 	return res, nil
+}
+
+func Signaling(m *msg.SignalingRequest) (*msg.SignalingResponse, error) {
+	conn := db.RedisPool.Get()
+	var query []interface{}
+	for _, v := range m.Peers {
+		query = append(query, v)
+	}
+	addrs, err := redis.Strings(conn.Do("MGET", query...))
+	if err != nil {
+		return nil, err
+	}
+
+	// WIP
+	fmt.Println(addrs)
+	return nil, nil
 }
 
 func convertRadius(unit string, radius float64) float64 {

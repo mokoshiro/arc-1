@@ -21,10 +21,6 @@ curl -X POST 'http://localhost:8000/api/member' -d \
 ### Get Member By Radius
 
 ```
-curl -X GET 'http://localhost:8080/api/member?longitude=63.000&latitude=130.0000&radius=200&unit=km&with_coord=true'
-```
-
-```
 curl -X GET 'http://localhost:8000/api/member' -d \
 '{
   "peer_id": "aaaa",
@@ -53,4 +49,19 @@ curl -X PUT 'http://localhost:8000/api/member' -d \
 
 ```
 curl -X DELETE 'http://localhost:8080/api/member' -d '{"id": "popo"}'
+```
+
+### Signaling Request
+
+```
+curl -X POST 'http://localhost:8000/api/signaling' -d \
+'{
+  "peers": [
+    "aaaa",
+    "bbbb",
+    "cccc",
+    "dddd"
+  ]
+}
+'
 ```

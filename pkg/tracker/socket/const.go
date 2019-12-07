@@ -11,7 +11,7 @@ import (
 var (
 	upgrader  = websocket.Upgrader{}
 	conns     = map[string]*Sock{}
-	SOCK_ADDR = fmt.Sprintf("%s:%s", os.Getenv("POD_IP"), "5000")
+	SOCK_ADDR = fmt.Sprintf("%s:%s", os.Getenv("POD_IP"), "8000")
 )
 
 const (

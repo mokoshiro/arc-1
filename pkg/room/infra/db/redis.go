@@ -3,19 +3,13 @@ package db
 import (
 	"time"
 
-	"github.com/Bo0km4n/arc/pkg/metadata/cmd/option"
+	"github.com/Bo0km4n/arc/pkg/room/cmd/option"
 	"github.com/garyburd/redigo/redis"
 )
 
 var (
 	RedisPool *redis.Pool
 )
-
-func InitDB() {
-	if option.Opt.UseRedis {
-		InitRedisPool()
-	}
-}
 
 func InitRedisPool() {
 	RedisPool = &redis.Pool{

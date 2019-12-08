@@ -10,6 +10,7 @@ go_library(
     importpath = "github.com/Bo0km4n/arc/pkg/broker/socket",
     visibility = ["//visibility:public"],
     deps = [
+        "//pkg/broker/cmd/option:go_default_library",
         "//pkg/broker/h3:go_default_library",
         "//pkg/broker/infra/db:go_default_library",
         "//pkg/broker/logger:go_default_library",

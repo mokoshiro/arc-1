@@ -2,6 +2,7 @@ package cmd
 
 import (
 	"context"
+	"fmt"
 	"log"
 
 	"net/http"
@@ -52,10 +53,10 @@ func Server(ctx context.Context) {
 	if !option.Opt.Ws {
 		brokerAPI.Run()
 	} else {
-		http.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
+		http.HandleFunc("/connect", func(w http.ResponseWriter, r *http.Request) {
 			socket.Serve(w, r)
 		})
-		if err := http.ListenAndServe(":8000", nil); err != nil {
+		if err := http.ListenAndServe(fmt.Sprintf(":%d", option.Opt.Port), nil); err != nil {
 			log.Fatal(err)
 		}
 	}

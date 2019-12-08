@@ -29,6 +29,11 @@ func init() {
 	coordinatorCmd.Flags().IntVarP(&option.Opt.RedisActive, "redis_max_active", "", 64, "redis max active connection")
 	coordinatorCmd.Flags().IntVarP(&option.Opt.RedisIdleTimeout, "redis_idle_timeout", "", 240, "redis idle timeout connection")
 	coordinatorCmd.Flags().IntVarP(&option.Opt.RedisKeyExpire, "redis_key_expire", "", 86400, "redis key expire")
+	coordinatorCmd.Flags().StringVarP(&option.Opt.MysqlHost, "mysql_host", "", "127.0.0.1", "mysql host address")
+	coordinatorCmd.Flags().StringVarP(&option.Opt.MysqlPort, "mysql_port", "", "3306", "mysql port")
+	coordinatorCmd.Flags().StringVarP(&option.Opt.MysqlPassword, "mysql_password", "", "root", "mysql password")
+	coordinatorCmd.Flags().StringVarP(&option.Opt.MysqlUser, "mysql_user", "", "root", "mysql user")
+	coordinatorCmd.Flags().StringVarP(&option.Opt.MysqlDatabase, "mysql_database", "", "arc", "mysql database")
 }
 
 func Coordinator(ctx context.Context) {

@@ -1,11 +1,13 @@
 package tunnel
 
 import (
+	"encoding/binary"
 	"fmt"
 	"io"
 	"sync"
 	"time"
 
+	"github.com/Bo0km4n/arc/pkg/room/api/message"
 	"github.com/Bo0km4n/arc/pkg/room/logger"
 	"github.com/gorilla/websocket"
 	"github.com/k0kubun/pp"
@@ -50,11 +52,12 @@ func (t *Tunnels) Load(key string) (*Tunnel, error) {
 
 type Tunnel struct {
 	id          string
+	mu          sync.Mutex
 	ws          *websocket.Conn
 	writeQueue  chan []byte
 	Done        chan interface{}
 	Err         chan error
-	permissions []string
+	permissions *sync.Map
 }
 
 func NewTunnel(ws *websocket.Conn, id string) *Tunnel {
@@ -64,33 +67,53 @@ func NewTunnel(ws *websocket.Conn, id string) *Tunnel {
 		writeQueue:  make(chan []byte, 1),
 		Done:        make(chan interface{}, 1),
 		Err:         make(chan error, 1),
-		permissions: make([]string, 1024),
+		permissions: new(sync.Map),
 	}
 }
 
-func (s *Tunnel) ReadPump() error {
-	s.ws.SetReadLimit(maxMessageSize)
-	s.ws.SetReadDeadline(time.Now().Add(readLimit))
-	s.ws.SetPongHandler(func(string) error { s.ws.SetReadDeadline(time.Now().Add(pongWait)); return nil })
+func (t *Tunnel) ReadPump() error {
+	t.ws.SetReadLimit(maxMessageSize)
+	t.ws.SetReadDeadline(time.Now().Add(readLimit))
+	t.ws.SetPongHandler(func(string) error { t.ws.SetReadDeadline(time.Now().Add(pongWait)); return nil })
 	for {
-		_, body, err := s.ws.ReadMessage()
+		_, body, err := t.ws.ReadMessage()
 		if err == io.EOF {
-			logger.L.Info(fmt.Sprintf("[Peer: %s] connection closed", s.id))
-			s.Done <- struct{}{}
+			logger.L.Info(fmt.Sprintf("[Peer: %s] connection closed", t.id))
+			t.Done <- struct{}{}
 			return nil
 		}
 		if err != nil {
 			logger.L.Info(err.Error())
-			s.Err <- err
+			t.Err <- err
 			return err
 		}
-		pp.Println(body)
-		// resp, err := handleMessage(body)
-		// if err != nil {
-		// 	logger.L.Error(err.Error())
-		// 	continue
-		// }
-		// s.writeQueue <- resp.Raw()
+
+		var messageType uint16
+		messageType = binary.BigEndian.Uint16(body[0:2])
+
+		var resp message.Response
+		pp.Println(messageType)
+		switch messageType {
+		case 1: // permission create
+			r, err := t.CreatePermission(body[2:])
+			if err != nil {
+				logger.L.Error(err.Error())
+				continue
+			}
+			resp = r
+		case 2: // upstream relay message
+			r, err := t.SendUpstreamRelayRequest(body[2:])
+			if err != nil {
+				logger.L.Error(err.Error())
+				continue
+			}
+			resp = r
+		default:
+			logger.L.Warn(fmt.Sprintf("Invalid message from %s", t.id))
+			continue
+		}
+
+		t.writeQueue <- resp.Raw()
 	}
 }
 
@@ -104,6 +127,7 @@ func (s *Tunnel) WritePump() {
 	for {
 		select {
 		case message, ok := <-s.writeQueue:
+			s.mu.Lock()
 			if !ok {
 				s.ws.WriteMessage(websocket.CloseMessage, []byte{})
 				logger.L.Error("Failed get message from write queue")
@@ -113,15 +137,30 @@ func (s *Tunnel) WritePump() {
 				logger.L.Error(err.Error())
 				return
 			}
+			s.mu.Unlock()
+
 		case <-ticker.C:
+			s.mu.Lock()
 			s.ws.SetWriteDeadline(time.Now().Add(writeWait))
 			if err := s.ws.WriteMessage(websocket.PingMessage, nil); err != nil {
 				return
 			}
+			s.mu.Unlock()
 		}
 	}
 }
 
 func (t *Tunnel) Close() {
+	t.mu.Lock()
 	t.ws.WriteMessage(websocket.CloseMessage, []byte{})
+	t.mu.Unlock()
+}
+
+func (t *Tunnel) storePermission(peer string) {
+	t.permissions.Store(peer, struct{}{})
+}
+
+func (t *Tunnel) loadPermission(peer string) bool {
+	_, ok := t.permissions.Load(peer)
+	return ok
 }

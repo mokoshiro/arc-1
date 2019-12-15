@@ -19,7 +19,6 @@ var coordinatorCmd = &cobra.Command{
 		db.InitRedisPool()
 	},
 	Run: func(cmd *cobra.Command, args []string) {
-		// Run Gateway API task
 		Coordinator(context.Background())
 	},
 }

@@ -5,5 +5,9 @@ go_library(
     srcs = ["client.go"],
     importpath = "github.com/Bo0km4n/arc/pkg/room/client",
     visibility = ["//visibility:public"],
-    deps = ["@com_github_gorilla_websocket//:go_default_library"],
+    deps = [
+        "//pkg/room/api/message:go_default_library",
+        "@com_github_gorilla_websocket//:go_default_library",
+        "@com_github_k0kubun_pp//:go_default_library",
+    ],
 )

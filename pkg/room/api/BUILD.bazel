@@ -1,0 +1,15 @@
+load("@io_bazel_rules_go//go:def.bzl", "go_library")
+
+go_library(
+    name = "go_default_library",
+    srcs = ["api.go"],
+    importpath = "github.com/Bo0km4n/arc/pkg/room/api",
+    visibility = ["//visibility:public"],
+    deps = [
+        "//pkg/room/api/middleware:go_default_library",
+        "//pkg/room/api/tunnel:go_default_library",
+        "//pkg/room/cmd/option:go_default_library",
+        "//pkg/room/logger:go_default_library",
+        "@com_github_gorilla_websocket//:go_default_library",
+    ],
+)

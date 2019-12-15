@@ -9,8 +9,9 @@ require (
 	github.com/golang/protobuf v1.3.2
 	github.com/gorilla/websocket v1.4.1
 	github.com/grpc-ecosystem/go-grpc-middleware v1.1.0
+	github.com/k0kubun/pp v3.0.1+incompatible
 	github.com/kr/pretty v0.1.0 // indirect
-	github.com/mattn/go-isatty v0.0.8 // indirect
+	github.com/mattn/go-colorable v0.1.4 // indirect
 	github.com/spf13/cobra v0.0.5
 	github.com/stretchr/testify v1.4.0
 	github.com/ugorji/go v1.1.7 // indirect

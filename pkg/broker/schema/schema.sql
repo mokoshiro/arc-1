@@ -2,6 +2,7 @@ CREATE TABLE `peer` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `peer_id` VARCHAR(512) NOT NULL UNIQUE,
   `addr` VARCHAR(32) NOT NULL,
+  `credential` VARCHAR(256) NOT NULL, 
   `location` POINT NOT NULL,
   `h3_hash` VARCHAR(32) NOT NULL,
   `h3_resolution` int(11),

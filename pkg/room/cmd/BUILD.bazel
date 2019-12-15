@@ -3,13 +3,17 @@ load("@io_bazel_rules_go//go:def.bzl", "go_library")
 go_library(
     name = "go_default_library",
     srcs = [
+        "client.go",
         "coordinator.go",
         "root.go",
     ],
     importpath = "github.com/Bo0km4n/arc/pkg/room/cmd",
     visibility = ["//visibility:public"],
     deps = [
+        "//pkg/room/api:go_default_library",
+        "//pkg/room/client:go_default_library",
         "//pkg/room/cmd/option:go_default_library",
+        "//pkg/room/infra/db:go_default_library",
         "//pkg/room/logger:go_default_library",
         "@com_github_spf13_cobra//:go_default_library",
     ],

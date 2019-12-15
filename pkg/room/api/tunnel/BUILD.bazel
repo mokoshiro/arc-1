@@ -1,0 +1,13 @@
+load("@io_bazel_rules_go//go:def.bzl", "go_library")
+
+go_library(
+    name = "go_default_library",
+    srcs = ["tunnel.go"],
+    importpath = "github.com/Bo0km4n/arc/pkg/room/api/tunnel",
+    visibility = ["//visibility:public"],
+    deps = [
+        "//pkg/room/logger:go_default_library",
+        "@com_github_gorilla_websocket//:go_default_library",
+        "@com_github_k0kubun_pp//:go_default_library",
+    ],
+)

@@ -16,6 +16,7 @@ var coordinatorCmd = &cobra.Command{
 	PreRun: func(cmd *cobra.Command, args []string) {
 		logger.Init()
 		db.InitMysql()
+		db.InitRedisPool()
 	},
 	Run: func(cmd *cobra.Command, args []string) {
 		// Run Gateway API task
@@ -37,6 +38,7 @@ func init() {
 	coordinatorCmd.Flags().IntVarP(&option.Opt.RedisActive, "redis_max_active", "", 64, "redis max active connection")
 	coordinatorCmd.Flags().IntVarP(&option.Opt.RedisIdleTimeout, "redis_idle_timeout", "", 240, "redis idle timeout connection")
 	coordinatorCmd.Flags().IntVarP(&option.Opt.RedisKeyExpire, "redis_key_expire", "", 86400, "redis key expire")
+	coordinatorCmd.Flags().BoolVarP(&option.Opt.Debug, "debug", "", false, "debug flag")
 }
 
 func Coordinator(ctx context.Context) {

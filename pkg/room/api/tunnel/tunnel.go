@@ -2,6 +2,7 @@ package tunnel
 
 import (
 	"fmt"
+	"io"
 	"sync"
 	"time"
 
@@ -48,17 +49,21 @@ func (t *Tunnels) Load(key string) (*Tunnel, error) {
 }
 
 type Tunnel struct {
+	id          string
 	ws          *websocket.Conn
 	writeQueue  chan []byte
 	Done        chan interface{}
+	Err         chan error
 	permissions []string
 }
 
-func NewTunnel(ws *websocket.Conn) *Tunnel {
+func NewTunnel(ws *websocket.Conn, id string) *Tunnel {
 	return &Tunnel{
+		id:          id,
 		ws:          ws,
 		writeQueue:  make(chan []byte, 1),
 		Done:        make(chan interface{}, 1),
+		Err:         make(chan error, 1),
 		permissions: make([]string, 1024),
 	}
 }
@@ -69,8 +74,14 @@ func (s *Tunnel) ReadPump() error {
 	s.ws.SetPongHandler(func(string) error { s.ws.SetReadDeadline(time.Now().Add(pongWait)); return nil })
 	for {
 		_, body, err := s.ws.ReadMessage()
+		if err == io.EOF {
+			logger.L.Info(fmt.Sprintf("[Peer: %s] connection closed", s.id))
+			s.Done <- struct{}{}
+			return nil
+		}
 		if err != nil {
 			logger.L.Info(err.Error())
+			s.Err <- err
 			return err
 		}
 		pp.Println(body)

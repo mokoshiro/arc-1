@@ -17,6 +17,7 @@ type Option struct {
 	MysqlMaxOpenConns int
 	MysqlMaxIdleConns int
 	GeoResolution     int
+	Debug             bool
 }
 
 var (

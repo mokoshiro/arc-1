@@ -6,6 +6,10 @@ services:
       - "6379:6379"
     volumes:
       - "./data/meta-redis:/data"
+  relay-dns:
+    image: "redis:latest"
+    ports:
+      - "16379:6379"
   tracker-db:
     image: mysql:5.7
     container_name: mysql_host

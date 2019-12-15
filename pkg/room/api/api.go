@@ -5,6 +5,8 @@ import (
 	"fmt"
 	"net/http"
 
+	"os"
+
 	"github.com/Bo0km4n/arc/pkg/room/api/middleware"
 	"github.com/Bo0km4n/arc/pkg/room/api/tunnel"
 	"github.com/Bo0km4n/arc/pkg/room/cmd/option"
@@ -13,7 +15,8 @@ import (
 )
 
 var (
-	upgrader = websocket.Upgrader{}
+	upgrader  = websocket.Upgrader{}
+	ROOM_ADDR = os.Getenv("ROOM_ADDR")
 )
 
 func Accept(w http.ResponseWriter, r *http.Request) {
@@ -32,7 +35,14 @@ func Accept(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	defer ws.Close()
-	t := tunnel.NewTunnel(ws)
+	// Build ws connection tunnel object
+	t := tunnel.NewTunnel(ws, peerID)
+	// Set connection information to Relay DNS
+	if err := middleware.SetTunnel(peerID, ROOM_ADDR); err != nil {
+		logger.L.Error(err.Error())
+		return
+	}
+	// Store tunnel object to global dictionary
 	tunnel.T.Store(peerID, t)
 
 	go t.ReadPump()
@@ -44,6 +54,14 @@ func Accept(w http.ResponseWriter, r *http.Request) {
 			t.Close()
 		}
 		logger.L.Info("Closing websocket")
+		t.Close()
+		middleware.RemoveTunnel(peerID)
+		return
+	case err, _ := <-t.Err:
+		e := fmt.Sprintf("[PeerID = %s] Unexpected error is happened in websockets: %s", peerID, err.Error())
+		logger.L.Error(e)
+		t.Close()
+		middleware.RemoveTunnel(peerID)
 		return
 	}
 }

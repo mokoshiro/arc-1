@@ -29,8 +29,25 @@ var (
 )
 
 type Tunnels struct {
-	m     sync.Mutex
-	peers map[string]*Tunnel
+	m            sync.Mutex
+	coordinators map[string]*websocket.Conn
+	peers        map[string]*Tunnel
+}
+
+func (t *Tunnels) StoreCoordinator(key string, conn *websocket.Conn) {
+	t.m.Lock()
+	defer t.m.Unlock()
+	t.coordinators[key] = conn
+}
+
+func (t *Tunnels) LoadCoordinator(key string) (*websocket.Conn, error) {
+	t.m.Lock()
+	defer t.m.Unlock()
+	conn, ok := t.coordinators[key]
+	if !ok {
+		return nil, fmt.Errorf("Coordinator: %s is not found", key)
+	}
+	return conn, nil
 }
 
 func (t *Tunnels) Store(key string, conn *Tunnel) {
@@ -45,7 +62,7 @@ func (t *Tunnels) Load(key string) (*Tunnel, error) {
 
 	conn, ok := t.peers[key]
 	if !ok {
-		return nil, fmt.Errorf("Peer ID: [%s] is not found", key)
+		return nil, fmt.Errorf("Peer ID: %s is not found", key)
 	}
 	return conn, nil
 }
@@ -82,10 +99,14 @@ func (t *Tunnel) ReadPump() error {
 			t.Done <- struct{}{}
 			return nil
 		}
-		if err != nil {
+		if err != nil && websocket.IsUnexpectedCloseError(err, 1000) {
 			logger.L.Info(err.Error())
 			t.Err <- err
 			return err
+		}
+		if websocket.IsCloseError(err, 1000) {
+			t.Done <- struct{}{}
+			return nil
 		}
 
 		var messageType uint16

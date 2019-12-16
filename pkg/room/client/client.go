@@ -4,10 +4,10 @@ import (
 	"fmt"
 	"log"
 	"net/url"
+	"os"
+	"os/signal"
 
 	"net/http"
-
-	"time"
 
 	"encoding/binary"
 	"encoding/json"
@@ -18,6 +18,9 @@ import (
 )
 
 func Run(peerID, credential, host string) {
+	interrupt := make(chan os.Signal, 1)
+	signal.Notify(interrupt, os.Interrupt)
+
 	fmt.Println(peerID, credential, host)
 	header := http.Header{}
 	header.Add("X-ARC-PEER-ID", peerID)
@@ -42,7 +45,17 @@ func Run(peerID, credential, host string) {
 	}, []byte("hello, world")))
 	defer c.Close()
 
-	time.Sleep(10 * time.Second)
+	for {
+		select {
+		case <-interrupt:
+			log.Println("interrupt")
+			err := c.WriteMessage(websocket.CloseMessage, websocket.FormatCloseMessage(websocket.CloseNormalClosure, ""))
+			if err != nil {
+				log.Fatal(err)
+			}
+			return
+		}
+	}
 }
 
 func newPermissionRequest(body []byte) []byte {

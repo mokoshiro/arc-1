@@ -19,7 +19,7 @@ var (
 	ROOM_ADDR = os.Getenv("ROOM_ADDR")
 )
 
-func Accept(w http.ResponseWriter, r *http.Request) {
+func AcceptPeer(w http.ResponseWriter, r *http.Request) {
 	logger.L.Info("Accepted Connection")
 	peerID := r.Header.Get("X-ARC-PEER-ID")
 	credential := r.Header.Get("X-ARC-PEER-CREDENTIAL")
@@ -53,12 +53,12 @@ func Accept(w http.ResponseWriter, r *http.Request) {
 		if !ok {
 			t.Close()
 		}
-		logger.L.Info("Closing websocket")
+		logger.L.Info(fmt.Sprintf("Closing websocket: peer_id=%s", peerID))
 		t.Close()
 		middleware.RemoveTunnel(peerID)
 		return
 	case err, _ := <-t.Err:
-		e := fmt.Sprintf("[PeerID = %s] Unexpected error is happened in websockets: %s", peerID, err.Error())
+		e := fmt.Sprintf("Unexpected error is happened in websockets: %s, peer_id=%s", err.Error(), peerID)
 		logger.L.Error(e)
 		t.Close()
 		middleware.RemoveTunnel(peerID)
@@ -66,9 +66,16 @@ func Accept(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
+func AcceptCoordinator(w http.ResponseWriter, r *http.Request) {
+
+}
+
 func Run(ctx context.Context) error {
 	http.HandleFunc("/bind", func(w http.ResponseWriter, r *http.Request) {
-		Accept(w, r)
+		AcceptPeer(w, r)
+	})
+	http.HandleFunc("/coordinator", func(w http.ResponseWriter, r *http.Request) {
+		AcceptCoordinator(w, r)
 	})
 	logger.L.Info(fmt.Sprintf("Listening Room Server on [:%d]", option.Opt.Port))
 	return http.ListenAndServe(fmt.Sprintf(":%d", option.Opt.Port), nil)

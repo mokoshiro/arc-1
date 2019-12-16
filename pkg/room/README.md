@@ -1,3 +1,10 @@
+## Getting Started
+
+```
+$ cd pkg/broker/schema && make init && make import // create database and create table
+$ bazel run //pkg/room -- coordinator --redis_host=127.0.0.1:16379 --port 8080 --debug
+```
+
 ## Room Server実装
 
 ### データ構造

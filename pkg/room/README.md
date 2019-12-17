@@ -15,7 +15,8 @@ $ bazel run //pkg/room -- client --in '{
     "host": "127.0.0.1:8080",
     "permission": [
         "bbbb"
-    ]
+    ],
+    "span": 6,
 }'
 ```
 

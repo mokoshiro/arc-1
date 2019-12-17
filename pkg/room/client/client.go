@@ -1,6 +1,7 @@
 package client
 
 import (
+	"fmt"
 	"log"
 	"net/url"
 	"os"
@@ -23,6 +24,7 @@ type input struct {
 	Credential string   `json:"credential"`
 	Host       string   `json:"host"`
 	Permission []string `json:"permission"`
+	Span       int      `json:"span"`
 }
 
 func Run(jsonin string) {
@@ -35,6 +37,8 @@ func Run(jsonin string) {
 		sender(in)
 	case "receiver":
 		receiver(in)
+	case "bench_sender":
+		benchSender(in)
 	}
 
 }
@@ -82,6 +86,7 @@ func sender(in *input) {
 
 	ticker := time.NewTicker(time.Second)
 	defer ticker.Stop()
+
 	for {
 		select {
 		case <-interrupt:
@@ -99,6 +104,62 @@ func sender(in *input) {
 	}
 }
 
+func benchSender(in *input) {
+	interrupt := make(chan os.Signal, 1)
+	signal.Notify(interrupt, os.Interrupt)
+	header := http.Header{}
+	header.Add("X-ARC-PEER-ID", in.ID)
+	header.Add("X-ARC-PEER-CREDENTIAL", in.Credential)
+	u := url.URL{Scheme: "ws", Host: in.Host, Path: "/bind"}
+
+	c, _, err := websocket.DefaultDialer.Dial(u.String(), header)
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	c.WriteMessage(websocket.BinaryMessage, newPermissionRequest(in))
+	defer c.Close()
+
+	ticker := time.NewTicker(time.Second)
+	defer ticker.Stop()
+	benchTicker := time.NewTicker(time.Minute * time.Duration(in.Span))
+	writeBytes := 0
+	defer func() {
+		log.Printf("writed bytes=%d", writeBytes)
+	}()
+	defer benchTicker.Stop()
+	go func() {
+		for {
+			if err := c.WriteMessage(websocket.BinaryMessage, newRelayMessage(in.Permission, make([]byte, 1024*1024))); err != nil {
+				log.Fatal(err)
+			}
+			writeBytes += 1024 * 1024
+			time.Sleep(45 * time.Millisecond)
+			c.SetWriteDeadline(time.Now().Add(time.Second * 10))
+			fmt.Fprintf(os.Stdout, "\rwrite bytes: %d", writeBytes)
+		}
+	}()
+
+	for {
+		select {
+		case <-interrupt:
+			log.Println("interrupt")
+			err := c.WriteMessage(websocket.CloseMessage, websocket.FormatCloseMessage(websocket.CloseNormalClosure, ""))
+			if err != nil {
+				log.Fatal(err)
+			}
+			time.Sleep(3 * time.Second)
+			return
+		// case <-ticker.C:
+		// 	c.WriteMessage(websocket.TextMessage, []byte(""))
+		case <-benchTicker.C:
+			log.Println("pasted 5 minutes")
+			time.Sleep(3 * time.Second)
+			return
+		}
+	}
+}
+
 func receiver(in *input) {
 	interrupt := make(chan os.Signal, 1)
 	signal.Notify(interrupt, os.Interrupt)
@@ -112,6 +173,7 @@ func receiver(in *input) {
 		log.Fatal(err)
 	}
 
+	readBytes := 0
 	go func() {
 		for {
 			mt, message, err := c.ReadMessage()
@@ -120,7 +182,8 @@ func receiver(in *input) {
 				return
 			}
 			if mt == 2 {
-				log.Printf("recv: %d", len(message))
+				readBytes += len(message)
+				fmt.Fprintf(os.Stdout, "\rreceive bytes: %d", readBytes)
 			}
 		}
 	}()

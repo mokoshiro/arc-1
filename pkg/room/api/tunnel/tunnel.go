@@ -4,7 +4,6 @@ import (
 	"encoding/binary"
 	"fmt"
 	"io"
-	"log"
 	"sync"
 	"time"
 
@@ -17,7 +16,7 @@ import (
 const (
 	writeWait      = 10 * time.Second
 	readLimit      = 30 * time.Second
-	maxMessageSize = 2048
+	maxMessageSize = 4096 * 1000 // 4MB
 	pongWait       = 60 * time.Second
 	pingPeriod     = 5 * time.Second
 )
@@ -96,8 +95,11 @@ func (t *Tunnel) ReadPump() error {
 			t.ws.SetReadDeadline(time.Now().Add(pongWait))
 			continue
 		}
+		if mt == websocket.BinaryMessage {
+			t.ws.SetReadDeadline(time.Now().Add(pongWait))
+		}
 
-		log.Printf("receive message type: %d, ttype=%d", mt, t.ttype)
+		// log.Printf("receive message type: %d, ttype=%d", mt, t.ttype)
 		if mt == -1 {
 			// error occured
 			// for debug
@@ -141,7 +143,9 @@ func (t *Tunnel) ReadPump() error {
 				logger.L.Error(err.Error())
 				continue
 			}
-			t.writeQueue <- resp.Raw()
+			if resp.Status == -1 {
+				t.writeQueue <- resp.Raw()
+			}
 		case 3: // downstream relay message
 			_, err := t.SendDownstreamRelayRequest(body[2:]) // ignore response
 			if err != nil {
@@ -165,7 +169,7 @@ func (s *Tunnel) WritePump() {
 	for {
 		select {
 		case message, ok := <-s.writeQueue:
-			// s.mu.Lock()
+			s.mu.Lock()
 			if !ok {
 				s.ws.WriteMessage(websocket.CloseMessage, []byte{})
 				logger.L.Error("Failed get message from write queue")
@@ -175,15 +179,19 @@ func (s *Tunnel) WritePump() {
 				logger.L.Error(err.Error())
 				return
 			}
-			// s.mu.Unlock()
+			s.mu.Unlock()
 
 		case <-ticker.C:
-			// s.mu.Lock()
-			s.ws.SetWriteDeadline(time.Now().Add(writeWait))
-			if err := s.ws.WriteMessage(websocket.TextMessage, []byte("")); err != nil {
-				return
+			if s.ttype == 2 {
+				// tunnel type == with coordinator,
+				// send ping message
+				s.mu.Lock()
+				s.ws.SetWriteDeadline(time.Now().Add(writeWait))
+				if err := s.ws.WriteMessage(websocket.TextMessage, []byte("")); err != nil {
+					return
+				}
+				s.mu.Unlock()
 			}
-			// s.mu.Unlock()
 		}
 	}
 }

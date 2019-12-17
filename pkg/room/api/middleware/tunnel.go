@@ -7,11 +7,10 @@ import (
 	"github.com/Bo0km4n/arc/pkg/room/infra/db"
 )
 
-func SetTunnel(peerID string, roomAddr string) error {
+func SetTunnel(peerID string) error {
 	redisConn := db.RedisPool.Get()
 	defer redisConn.Close()
-
-	_, err := redisConn.Do("SETEX", peerID, option.Opt.RedisKeyExpire, fmt.Sprintf("%s:%d", roomAddr, option.Opt.Port))
+	_, err := redisConn.Do("SETEX", peerID, option.Opt.RedisKeyExpire, fmt.Sprintf("%s:%d", option.Opt.GlobalAddress, option.Opt.Port))
 	return err
 }
 

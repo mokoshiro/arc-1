@@ -5,8 +5,6 @@ import (
 	"fmt"
 	"net/http"
 
-	"os"
-
 	"github.com/Bo0km4n/arc/pkg/room/api/middleware"
 	"github.com/Bo0km4n/arc/pkg/room/api/tunnel"
 	"github.com/Bo0km4n/arc/pkg/room/cmd/option"
@@ -15,8 +13,7 @@ import (
 )
 
 var (
-	upgrader  = websocket.Upgrader{}
-	ROOM_ADDR = os.Getenv("ROOM_ADDR")
+	upgrader = websocket.Upgrader{}
 )
 
 func AcceptPeer(w http.ResponseWriter, r *http.Request) {
@@ -38,7 +35,7 @@ func AcceptPeer(w http.ResponseWriter, r *http.Request) {
 	// Build ws connection tunnel object
 	t := tunnel.NewTunnel(1, ws, peerID)
 	// Set connection information to Relay DNS
-	if err := middleware.SetTunnel(peerID, ROOM_ADDR); err != nil {
+	if err := middleware.SetTunnel(peerID); err != nil {
 		logger.L.Error(err.Error())
 		return
 	}

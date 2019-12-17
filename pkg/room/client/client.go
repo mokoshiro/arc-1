@@ -93,7 +93,7 @@ func sender(in *input) {
 			time.Sleep(3 * time.Second)
 			return
 		case <-ticker.C:
-			c.WriteMessage(websocket.BinaryMessage, newRelayMessage(in.Permission, []byte("hello, world")))
+			c.WriteMessage(websocket.BinaryMessage, newRelayMessage(in.Permission, make([]byte, 512)))
 			c.WriteMessage(websocket.TextMessage, []byte(""))
 		}
 	}
@@ -120,7 +120,7 @@ func receiver(in *input) {
 				return
 			}
 			if mt == 2 {
-				log.Printf("recv: %s", message)
+				log.Printf("recv: %d", len(message))
 			}
 		}
 	}()

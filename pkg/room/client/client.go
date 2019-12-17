@@ -35,13 +35,9 @@ func Run(peerID, credential, host string) {
 	c.WriteMessage(websocket.BinaryMessage, newPermissionRequest([]byte(`{
 		"peers": [
 			"bbbb",
-			"cccc",
-			"dddd"
 		]}`)))
 	c.WriteMessage(websocket.BinaryMessage, newRelayMessage([]string{
 		"bbbb",
-		"cccc",
-		"dddd",
 	}, []byte("hello, world")))
 	defer c.Close()
 

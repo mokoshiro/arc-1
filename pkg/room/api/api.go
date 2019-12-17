@@ -67,7 +67,34 @@ func AcceptPeer(w http.ResponseWriter, r *http.Request) {
 }
 
 func AcceptCoordinator(w http.ResponseWriter, r *http.Request) {
+	remoteCoordinatorAddr := r.Header.Get("X-ARC-COORDINATOR-ID")
+	ws, err := upgrader.Upgrade(w, r, nil)
+	if err != nil {
+		logger.L.Error(err.Error())
+		return
+	}
+	defer ws.Close()
 
+	coordinatorTunnel := tunnel.NewTunnel(ws, remoteCoordinatorAddr)
+	tunnel.T.StoreCoordinator(remoteCoordinatorAddr, coordinatorTunnel)
+
+	go coordinatorTunnel.ReadPump()
+	go coordinatorTunnel.WritePump()
+
+	select {
+	case _, ok := <-coordinatorTunnel.Done:
+		if !ok {
+			coordinatorTunnel.Close()
+		}
+		logger.L.Info(fmt.Sprintf("Closing websocket: coordinator_address=%s", remoteCoordinatorAddr))
+		coordinatorTunnel.Close()
+		return
+	case err, _ := <-coordinatorTunnel.Err:
+		e := fmt.Sprintf("Unexpected error is happened in websockets: %s, peer_id=%s", err.Error(), remoteCoordinatorAddr)
+		logger.L.Error(e)
+		coordinatorTunnel.Close()
+		return
+	}
 }
 
 func Run(ctx context.Context) error {

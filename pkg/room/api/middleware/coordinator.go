@@ -5,6 +5,8 @@ import (
 	"net/http"
 	"net/url"
 
+	"github.com/Bo0km4n/arc/pkg/room/infra/db"
+	"github.com/garyburd/redigo/redis"
 	"github.com/gorilla/websocket"
 )
 
@@ -19,4 +21,11 @@ func DialOtherCoordinator(selfAddr, addr string) (*websocket.Conn, error) {
 	}
 
 	return c, err
+}
+
+func GetRemoteCoordinatorAddressByPeer(id string) (string, error) {
+	c := db.RedisPool.Get()
+	defer c.Close()
+
+	return redis.String(c.Do("GET", id))
 }

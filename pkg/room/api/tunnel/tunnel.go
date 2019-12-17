@@ -7,7 +7,6 @@ import (
 	"sync"
 	"time"
 
-	"github.com/Bo0km4n/arc/pkg/room/api/message"
 	"github.com/Bo0km4n/arc/pkg/room/logger"
 	"github.com/gorilla/websocket"
 	"github.com/k0kubun/pp"
@@ -30,24 +29,22 @@ var (
 
 type Tunnels struct {
 	m            sync.Mutex
-	coordinators map[string]*websocket.Conn
+	coordinators map[string]*Tunnel
 	peers        map[string]*Tunnel
 }
 
-func (t *Tunnels) StoreCoordinator(key string, conn *websocket.Conn) {
+func (t *Tunnels) StoreCoordinator(key string, conn *Tunnel) {
 	t.m.Lock()
 	defer t.m.Unlock()
+
 	t.coordinators[key] = conn
 }
 
-func (t *Tunnels) LoadCoordinator(key string) (*websocket.Conn, error) {
+func (t *Tunnels) LoadCoordinator(key string) (*Tunnel, bool) {
 	t.m.Lock()
 	defer t.m.Unlock()
 	conn, ok := t.coordinators[key]
-	if !ok {
-		return nil, fmt.Errorf("Coordinator: %s is not found", key)
-	}
-	return conn, nil
+	return conn, ok
 }
 
 func (t *Tunnels) Store(key string, conn *Tunnel) {
@@ -56,15 +53,12 @@ func (t *Tunnels) Store(key string, conn *Tunnel) {
 	t.peers[key] = conn
 }
 
-func (t *Tunnels) Load(key string) (*Tunnel, error) {
+func (t *Tunnels) Load(key string) (*Tunnel, bool) {
 	t.m.Lock()
 	defer t.m.Unlock()
 
 	conn, ok := t.peers[key]
-	if !ok {
-		return nil, fmt.Errorf("Peer ID: %s is not found", key)
-	}
-	return conn, nil
+	return conn, ok
 }
 
 type Tunnel struct {
@@ -112,7 +106,6 @@ func (t *Tunnel) ReadPump() error {
 		var messageType uint16
 		messageType = binary.BigEndian.Uint16(body[0:2])
 
-		var resp message.Response
 		pp.Println(messageType)
 		switch messageType {
 		case 1: // permission create
@@ -121,20 +114,23 @@ func (t *Tunnel) ReadPump() error {
 				logger.L.Error(err.Error())
 				continue
 			}
-			resp = r
+			t.writeQueue <- r.Raw()
 		case 2: // upstream relay message
-			r, err := t.SendUpstreamRelayRequest(body[2:])
+			_, err := t.SendUpstreamRelayRequest(body[2:]) // ignore respone
 			if err != nil {
 				logger.L.Error(err.Error())
 				continue
 			}
-			resp = r
+		case 3: // downstream relay message
+			_, err := t.SendDownstreamRelayRequest(body[2:]) // ignore response
+			if err != nil {
+				logger.L.Error(err.Error())
+				continue
+			}
 		default:
 			logger.L.Warn(fmt.Sprintf("Invalid message from %s", t.id))
 			continue
 		}
-
-		t.writeQueue <- resp.Raw()
 	}
 }
 
@@ -169,6 +165,10 @@ func (s *Tunnel) WritePump() {
 			s.mu.Unlock()
 		}
 	}
+}
+
+func (t *Tunnel) OnceWriteMessage(payload []byte) {
+	t.writeQueue <- payload
 }
 
 func (t *Tunnel) Close() {

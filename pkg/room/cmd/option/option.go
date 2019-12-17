@@ -1,6 +1,7 @@
 package option
 
 type Option struct {
+	GlobalAddress     string
 	Port              int
 	UseRedis          bool
 	Ws                bool

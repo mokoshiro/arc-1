@@ -25,6 +25,7 @@ var coordinatorCmd = &cobra.Command{
 
 func init() {
 	rootCmd.AddCommand(coordinatorCmd)
+	coordinatorCmd.Flags().StringVarP(&option.Opt.GlobalAddress, "global", "g", "0.0.0.0", "global address")
 	coordinatorCmd.Flags().BoolVarP(&option.Opt.Ws, "ws", "", true, "use websockets")
 	coordinatorCmd.Flags().IntVarP(&option.Opt.Port, "port", "p", 50051, "listen port")
 	coordinatorCmd.Flags().StringVarP(&option.Opt.MysqlHost, "mysql_host", "", "127.0.0.1", "mysql host address")

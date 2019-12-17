@@ -2,11 +2,11 @@ package tunnel
 
 import (
 	"fmt"
+
 	"github.com/Bo0km4n/arc/pkg/room/api/message"
 	"github.com/Bo0km4n/arc/pkg/room/api/middleware"
 	"github.com/Bo0km4n/arc/pkg/room/cmd/option"
 	"github.com/Bo0km4n/arc/pkg/room/logger"
-	"github.com/k0kubun/pp"
 )
 
 func (t *Tunnel) SendUpstreamRelayRequest(body []byte) (*message.UpstreamRelayResponse, error) {
@@ -14,11 +14,13 @@ func (t *Tunnel) SendUpstreamRelayRequest(body []byte) (*message.UpstreamRelayRe
 	if err != nil {
 		return nil, err
 	}
-	pp.Println(req)
 
 	for _, dest := range req.Destinations.Peers {
 		if err := t.relayUpstreamRequest(dest, req.Payload); err != nil {
 			logger.L.Warn(err.Error())
+			return &message.UpstreamRelayResponse{
+				Status: -1,
+			}, nil
 		}
 	}
 	return &message.UpstreamRelayResponse{
@@ -44,7 +46,7 @@ func (t *Tunnel) relayUpstreamRequest(dest string, payload []byte) error {
 		go remoteTunnel.WritePump()
 		T.StoreCoordinator(remoteCoordinatorAddr, remoteTunnel)
 	}
-	req := message.NewDownstreamRelayRequestRaw(dest, payload)
+	req := message.NewDownstreamRelayRequestRaw(t.id, dest, payload)
 	remoteTunnel.OnceWriteMessage(req)
 	return nil
 }
@@ -57,6 +59,9 @@ func (t *Tunnel) SendDownstreamRelayRequest(body []byte) (*message.DownstreamRel
 	leftTunnel, ok := T.Load(req.Destination)
 	if !ok {
 		return nil, fmt.Errorf("Not found peer connection: id=%s", req.Destination)
+	}
+	if !leftTunnel.IsExistPermission(req.Source) {
+		return nil, fmt.Errorf("Access denied from id=%s", req.Source)
 	}
 	leftTunnel.OnceWriteMessage(req.Payload)
 	return &message.DownstreamRelayResponse{

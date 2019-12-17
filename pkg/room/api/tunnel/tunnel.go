@@ -119,6 +119,10 @@ func (t *Tunnel) ReadPump() error {
 			t.Done <- struct{}{}
 			return nil
 		}
+		if err != nil { // catch unexpected error such as websocket.netError
+			t.Err <- err
+			return err
+		}
 
 		var messageType uint16
 		messageType = binary.BigEndian.Uint16(body[0:2])
@@ -132,11 +136,12 @@ func (t *Tunnel) ReadPump() error {
 			}
 			t.writeQueue <- r.Raw()
 		case 2: // upstream relay message
-			_, err := t.SendUpstreamRelayRequest(body[2:]) // ignore respone
+			resp, err := t.SendUpstreamRelayRequest(body[2:]) // ignore respone
 			if err != nil {
 				logger.L.Error(err.Error())
 				continue
 			}
+			t.writeQueue <- resp.Raw()
 		case 3: // downstream relay message
 			_, err := t.SendDownstreamRelayRequest(body[2:]) // ignore response
 			if err != nil {

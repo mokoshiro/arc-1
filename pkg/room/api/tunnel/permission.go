@@ -16,3 +16,7 @@ func (t *Tunnel) CreatePermission(b []byte) (*message.PermissionResponse, error)
 		Status: 1,
 	}, nil
 }
+
+func (t *Tunnel) IsExistPermission(key string) bool {
+	return t.loadPermission(key)
+}

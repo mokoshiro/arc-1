@@ -3,8 +3,6 @@ package message
 import (
 	"encoding/binary"
 	"encoding/json"
-
-	"github.com/k0kubun/pp"
 )
 
 type UpstreamRelayRequest struct {
@@ -42,6 +40,8 @@ func (ur *UpstreamRelayResponse) Raw() []byte {
 }
 
 type DownstreamRelayRequest struct {
+	SourceLength      uint32
+	Source            string
 	DestinationLength uint32
 	Destination       string
 	Payload           []byte
@@ -57,21 +57,27 @@ func (dr *DownstreamRelayResponse) Raw() []byte {
 }
 
 func ParseDownstreamRelayRequest(body []byte) (*DownstreamRelayRequest, error) {
-	pp.Println(string(body))
-	length := binary.BigEndian.Uint32(body[0:4])
-	dest := string(body[4 : 4+length])
-
+	sourceLength := binary.BigEndian.Uint32(body[0:4])
+	source := string(body[4 : 4+sourceLength])
+	destLength := binary.BigEndian.Uint32(body[4+sourceLength : 8+sourceLength])
+	dest := string(body[8+sourceLength : 8+sourceLength+destLength])
 	return &DownstreamRelayRequest{
-		DestinationLength: length,
+		SourceLength:      sourceLength,
+		Source:            source,
+		DestinationLength: destLength,
 		Destination:       dest,
-		Payload:           body[4+length:],
+		Payload:           body[8+sourceLength+destLength:],
 	}, nil
 }
 
-func NewDownstreamRelayRequestRaw(dest string, payload []byte) []byte {
+func NewDownstreamRelayRequestRaw(source string, dest string, payload []byte) []byte {
 	head := []byte{0x00, 0x03} // downstream request type
-	destLen := uint32(len(dest))
+	sourceLen := uint32(len(source))
 	bytes := make([]byte, 4)
+	binary.BigEndian.PutUint32(bytes, sourceLen)
+	head = append(head, bytes...)
+	head = append(head, []byte(source)...)
+	destLen := uint32(len(dest))
 	binary.BigEndian.PutUint32(bytes, destLen)
 	head = append(head, bytes...)
 	head = append(head, []byte(dest)...)

@@ -9,6 +9,7 @@ $ bazel run //pkg/room -- coordinator --redis_host=127.0.0.1:16379 --port 8080 -
 **Room Client**
 ```
 $ bazel run //pkg/room -- client --in '{ 
+    "mode": "sender",
     "id": "aaaa",
     "credential": "",
     "host": "127.0.0.1:8080",

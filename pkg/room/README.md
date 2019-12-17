@@ -8,7 +8,14 @@ $ bazel run //pkg/room -- coordinator --redis_host=127.0.0.1:16379 --port 8080 -
 
 **Room Client**
 ```
-$ bazel run //pkg/room -- client --host 127.0.0.1:8080 --id aaaa --credential xxxx
+$ bazel run //pkg/room -- client --in '{ 
+    "id": "aaaa",
+    "credential": "",
+    "host": "127.0.0.1:8080",
+    "permission": [
+        "bbbb"
+    ]
+}'
 ```
 
 ## Room Server実装

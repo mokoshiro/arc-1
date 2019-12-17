@@ -36,7 +36,7 @@ func AcceptPeer(w http.ResponseWriter, r *http.Request) {
 	}
 	defer ws.Close()
 	// Build ws connection tunnel object
-	t := tunnel.NewTunnel(ws, peerID)
+	t := tunnel.NewTunnel(1, ws, peerID)
 	// Set connection information to Relay DNS
 	if err := middleware.SetTunnel(peerID, ROOM_ADDR); err != nil {
 		logger.L.Error(err.Error())
@@ -69,13 +69,14 @@ func AcceptPeer(w http.ResponseWriter, r *http.Request) {
 func AcceptCoordinator(w http.ResponseWriter, r *http.Request) {
 	remoteCoordinatorAddr := r.Header.Get("X-ARC-COORDINATOR-ID")
 	ws, err := upgrader.Upgrade(w, r, nil)
+	logger.L.Info(fmt.Sprintf("Accepted Coordinator connection: addr=%s", remoteCoordinatorAddr))
 	if err != nil {
 		logger.L.Error(err.Error())
 		return
 	}
 	defer ws.Close()
 
-	coordinatorTunnel := tunnel.NewTunnel(ws, remoteCoordinatorAddr)
+	coordinatorTunnel := tunnel.NewTunnel(2, ws, remoteCoordinatorAddr)
 	tunnel.T.StoreCoordinator(remoteCoordinatorAddr, coordinatorTunnel)
 
 	go coordinatorTunnel.ReadPump()

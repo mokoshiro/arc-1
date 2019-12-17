@@ -1,11 +1,11 @@
 package client
 
 import (
-	"fmt"
 	"log"
 	"net/url"
 	"os"
 	"os/signal"
+	"time"
 
 	"net/http"
 
@@ -17,30 +17,53 @@ import (
 	"github.com/k0kubun/pp"
 )
 
-func Run(peerID, credential, host string) {
+type input struct {
+	ID         string   `json:"id"`
+	Credential string   `json:"credential"`
+	Host       string   `json:"host"`
+	Permission []string `json:"permission"`
+}
+
+func Run(jsonin string) {
+
+	pp.Println(jsonin)
 	interrupt := make(chan os.Signal, 1)
 	signal.Notify(interrupt, os.Interrupt)
 
-	fmt.Println(peerID, credential, host)
+	in := &input{}
+	json.Unmarshal([]byte(jsonin), in)
+
+	pp.Println(in)
 	header := http.Header{}
-	header.Add("X-ARC-PEER-ID", peerID)
-	header.Add("X-ARC-PEER-CREDENTIAL", credential)
-	u := url.URL{Scheme: "ws", Host: host, Path: "/bind"}
+	header.Add("X-ARC-PEER-ID", in.ID)
+	header.Add("X-ARC-PEER-CREDENTIAL", in.Credential)
+	u := url.URL{Scheme: "ws", Host: in.Host, Path: "/bind"}
 
 	c, _, err := websocket.DefaultDialer.Dial(u.String(), header)
 	if err != nil {
 		log.Fatal(err)
 	}
 
-	c.WriteMessage(websocket.BinaryMessage, newPermissionRequest([]byte(`{
-		"peers": [
-			"bbbb",
-		]}`)))
+	c.WriteMessage(websocket.BinaryMessage, newPermissionRequest(in))
 	c.WriteMessage(websocket.BinaryMessage, newRelayMessage([]string{
 		"bbbb",
 	}, []byte("hello, world")))
 	defer c.Close()
 
+	go func() {
+		for {
+			mt, m, err := c.ReadMessage()
+			if err != nil {
+				log.Fatal(err)
+			}
+			if mt != websocket.TextMessage {
+				log.Printf("recv: %s", m)
+			}
+		}
+	}()
+
+	ticker := time.NewTicker(time.Second)
+	defer ticker.Stop()
 	for {
 		select {
 		case <-interrupt:
@@ -49,15 +72,20 @@ func Run(peerID, credential, host string) {
 			if err != nil {
 				log.Fatal(err)
 			}
+			time.Sleep(3 * time.Second)
 			return
+		case <-ticker.C:
+			c.WriteMessage(websocket.TextMessage, []byte("hello"))
 		}
 	}
 }
 
-func newPermissionRequest(body []byte) []byte {
+func newPermissionRequest(in *input) []byte {
 	b := []byte{0x00, 0x01}
-	b = append(b, body...)
-	pp.Println(b)
+	jsonb, _ := json.Marshal(&message.PermissionRequest{
+		Peers: in.Permission,
+	})
+	b = append(b, jsonb...)
 	return b
 }
 

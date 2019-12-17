@@ -9,7 +9,8 @@ type PermissionRequest struct {
 }
 
 type PermissionResponse struct {
-	Status int `json:"status"`
+	Type   string `json:"type"`
+	Status int    `json:"status"`
 }
 
 func ParsePermissionRequest(b []byte) (*PermissionRequest, error) {

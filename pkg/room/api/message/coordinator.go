@@ -3,6 +3,8 @@ package message
 import (
 	"encoding/binary"
 	"encoding/json"
+
+	"github.com/k0kubun/pp"
 )
 
 type UpstreamRelayRequest struct {
@@ -55,6 +57,7 @@ func (dr *DownstreamRelayResponse) Raw() []byte {
 }
 
 func ParseDownstreamRelayRequest(body []byte) (*DownstreamRelayRequest, error) {
+	pp.Println(string(body))
 	length := binary.BigEndian.Uint32(body[0:4])
 	dest := string(body[4 : 4+length])
 
@@ -63,4 +66,15 @@ func ParseDownstreamRelayRequest(body []byte) (*DownstreamRelayRequest, error) {
 		Destination:       dest,
 		Payload:           body[4+length:],
 	}, nil
+}
+
+func NewDownstreamRelayRequestRaw(dest string, payload []byte) []byte {
+	head := []byte{0x00, 0x03} // downstream request type
+	destLen := uint32(len(dest))
+	bytes := make([]byte, 4)
+	binary.BigEndian.PutUint32(bytes, destLen)
+	head = append(head, bytes...)
+	head = append(head, []byte(dest)...)
+	head = append(head, payload...)
+	return head
 }

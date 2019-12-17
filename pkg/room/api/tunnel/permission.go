@@ -12,6 +12,7 @@ func (t *Tunnel) CreatePermission(b []byte) (*message.PermissionResponse, error)
 		t.storePermission(v)
 	}
 	return &message.PermissionResponse{
+		Type:   "Permission Create",
 		Status: 1,
 	}, nil
 }

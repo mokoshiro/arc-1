@@ -9,9 +9,7 @@ import (
 )
 
 var (
-	clientID         string
-	clientCredential string
-	clientHost       string
+	in string
 )
 
 var clientCmd = &cobra.Command{
@@ -27,11 +25,9 @@ var clientCmd = &cobra.Command{
 
 func init() {
 	rootCmd.AddCommand(clientCmd)
-	clientCmd.Flags().StringVarP(&clientID, "id", "", "user1", "client peer id")
-	clientCmd.Flags().StringVarP(&clientCredential, "credential", "c", "password", "client credential")
-	clientCmd.Flags().StringVarP(&clientHost, "host", "", "localhost:8000", "target host")
+	clientCmd.Flags().StringVarP(&in, "in", "i", "", "json input")
 }
 
 func Client(ctx context.Context) {
-	client.Run(clientID, clientCredential, clientHost)
+	client.Run(in)
 }

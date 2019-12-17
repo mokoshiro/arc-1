@@ -39,10 +39,13 @@ func (t *Tunnel) relayUpstreamRequest(dest string, payload []byte) error {
 		if err != nil {
 			return err
 		}
-		remoteTunnel = NewTunnel(ws, remoteCoordinatorAddr)
-		T.StoreCoordinator(remoteCoordinatorAddr, t)
+		remoteTunnel = NewTunnel(2, ws, remoteCoordinatorAddr)
+		go remoteTunnel.ReadPump()
+		go remoteTunnel.WritePump()
+		T.StoreCoordinator(remoteCoordinatorAddr, remoteTunnel)
 	}
-	remoteTunnel.OnceWriteMessage(payload)
+	req := message.NewDownstreamRelayRequestRaw(dest, payload)
+	remoteTunnel.OnceWriteMessage(req)
 	return nil
 }
 

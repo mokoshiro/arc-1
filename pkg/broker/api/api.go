@@ -36,10 +36,10 @@ func (a *brokerHTTPAPI) Run() {
 		"/api/member", a.PutMember,
 	)
 	e.POST(
-		"/api/signaling", a.Signaling,
+		"/api/signaling", a.Signaling, // not implemented
 	)
 	e.POST(
-		"/api/signaling/peer/status", a.PingPeerStatus,
+		"/api/signaling/peer/status", a.PingPeerStatus, // not implemented
 	)
 	e.POST(
 		"/api/room/notification", a.RoomNotification,

@@ -4,8 +4,10 @@ import (
 	"encoding/binary"
 	"fmt"
 	"io"
+	"log"
 	"sync"
 	"time"
+	"unsafe"
 
 	"github.com/Bo0km4n/arc/pkg/room/cmd/option"
 	"github.com/Bo0km4n/arc/pkg/room/logger"
@@ -75,7 +77,7 @@ type Tunnel struct {
 }
 
 func NewTunnel(ttype int, ws *websocket.Conn, id string) *Tunnel {
-	return &Tunnel{
+	t := &Tunnel{
 		ttype:       ttype,
 		id:          id,
 		ws:          ws,
@@ -84,6 +86,8 @@ func NewTunnel(ttype int, ws *websocket.Conn, id string) *Tunnel {
 		Err:         make(chan error, 1),
 		permissions: new(sync.Map),
 	}
+	log.Printf("tunnel size: %d", unsafe.Sizeof(*t))
+	return t
 }
 
 func (t *Tunnel) ReadPump() error {

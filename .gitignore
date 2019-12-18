@@ -1,8 +1,8 @@
 infra/local/data/
+/infra/local/mysql
 /bazel-bin
 /bazel-arc
 /bazel-genfiles
 /bazel-out
 /bazel-testlogs
 /vendor
-*.pb.go

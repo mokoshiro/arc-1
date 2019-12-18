@@ -14,7 +14,7 @@ build:
 
 .PHONY: test
 test:
-	bazel ${BZFLAGS} test -- //internal/... //pkg/...
+	bazel ${BZFLAGS} test --test_output=errors -- //internal/... //pkg/...
 
 .PHONY: dep
 dep:

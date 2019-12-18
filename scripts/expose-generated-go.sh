@@ -36,7 +36,7 @@ expose_package () {
 	for f in ${old_links}; do
 		if [[ -f "${f}" ]]; then
 			echo "Deleting old link: ${f}"
-			rm ${f}
+			rm -f ${f}
 		fi
 	done
 
@@ -47,7 +47,7 @@ expose_package () {
 			found=1
 			local base=${f##*/}
 			echo "Adding a new link: ${package}/${base}"
-			ln -nsf "${relative_path}${f}" "${package}/"
+			cp -f "${GOPATH}/src/github.com/Bo0km4n/arc/${f}" "${package}/${base}"
 			if [[ ${base} == *.pb.validate.go ]]; then
 				echo "# gazelle:exclude ${package}/${base}" >> ${ROOT}/BUILD.bazel
 			fi

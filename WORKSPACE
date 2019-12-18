@@ -330,13 +330,13 @@ go_repository(
 go_repository(
     name = "com_github_ugorji_go",
     importpath = "github.com/ugorji/go",
-    tag = "v1.1.4",
+    tag = "v1.1.7",
 )
 
 go_repository(
     name = "com_github_ugorji_go_codec",
-    commit = "d75b2dcb6bc8",
     importpath = "github.com/ugorji/go/codec",
+    tag = "v1.1.7",
 )
 
 go_repository(
@@ -347,7 +347,7 @@ go_repository(
 
 go_repository(
     name = "in_gopkg_check_v1",
-    commit = "20d25e280405",
+    commit = "41f04d3bba15",
     importpath = "gopkg.in/check.v1",
 )
 
@@ -366,7 +366,7 @@ go_repository(
 go_repository(
     name = "in_gopkg_yaml_v2",
     importpath = "gopkg.in/yaml.v2",
-    tag = "v2.2.2",
+    tag = "v2.2.4",
 )
 
 go_repository(
@@ -877,4 +877,16 @@ go_repository(
     name = "com_github_mattn_go_colorable",
     importpath = "github.com/mattn/go-colorable",
     tag = "v0.1.4",
+)
+
+go_repository(
+    name = "com_github_gorilla_websocket",
+    importpath = "github.com/gorilla/websocket",
+    tag = "v1.4.1",
+)
+
+go_repository(
+    name = "com_github_go_sql_driver_mysql",
+    importpath = "github.com/go-sql-driver/mysql",
+    tag = "v1.4.1",
 )

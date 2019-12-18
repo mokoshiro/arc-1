@@ -1,0 +1,16 @@
+load("@io_bazel_rules_go//go:def.bzl", "go_library")
+
+go_library(
+    name = "go_default_library",
+    srcs = [
+        "mysql.go",
+        "redis.go",
+    ],
+    importpath = "github.com/Bo0km4n/arc/pkg/room/infra/db",
+    visibility = ["//visibility:public"],
+    deps = [
+        "//pkg/room/cmd/option:go_default_library",
+        "@com_github_garyburd_redigo//redis:go_default_library",
+        "@com_github_go_sql_driver_mysql//:go_default_library",
+    ],
+)

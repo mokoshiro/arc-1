@@ -1,0 +1,13 @@
+load("@io_bazel_rules_go//go:def.bzl", "go_library")
+
+go_library(
+    name = "go_default_library",
+    srcs = [
+        "coordinator.go",
+        "permission.go",
+        "types.go",
+    ],
+    importpath = "github.com/Bo0km4n/arc/pkg/room/api/message",
+    visibility = ["//visibility:public"],
+    deps = ["@com_github_k0kubun_pp//:go_default_library"],
+)

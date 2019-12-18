@@ -1,9 +1,0 @@
-load("@io_bazel_rules_go//go:def.bzl", "go_library")
-
-go_library(
-    name = "go_default_library",
-    srcs = ["logger.go"],
-    importpath = "github.com/Bo0km4n/arc/pkg/tracker/logger",
-    visibility = ["//visibility:public"],
-    deps = ["@org_uber_go_zap//:go_default_library"],
-)

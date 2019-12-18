@@ -1,21 +1,28 @@
 version: '3'
 services:
-  locker-redis:
-    image: "redis:latest"
-    ports:
-      - "26379:6379"
-    volumes:
-      - "./data/meta-redis:/data"
-  meta-redis:
+  connection-meta:
     image: "redis:latest"
     ports:
       - "6379:6379"
     volumes:
       - "./data/meta-redis:/data"
-  tracker-redis:
+  relay-dns:
     image: "redis:latest"
     ports:
       - "16379:6379"
+  tracker-db:
+    image: mysql:5.7
+    container_name: mysql_host
+    environment:
+      MYSQL_ROOT_PASSWORD: root
+      MYSQL_DATABASE: test_database
+      MYSQL_USER: docker
+      MYSQL_PASSWORD: docker
+      TZ: 'Asia/Tokyo'
+    command: mysqld --character-set-server=utf8mb4 --collation-server=utf8mb4_unicode_ci
     volumes:
-      - "./data/tracker-redis:/data"
+    - ./mysql/my.cnf:/etc/mysql/conf.d/my.cnf
+    - ./mysql/sql:/docker-entrypoint-initdb.d
+    ports:
+    - 3306:3306
       

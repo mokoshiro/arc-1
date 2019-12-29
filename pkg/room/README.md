@@ -7,6 +7,8 @@ $ bazel run //pkg/room -- coordinator --redis_host=127.0.0.1:16379 --port 8080 -
 ```
 
 **Room Client**
+
+- Reader
 ```
 $ bazel run //pkg/room -- client --in '{ 
     "mode": "sender",
@@ -16,7 +18,23 @@ $ bazel run //pkg/room -- client --in '{
     "permission": [
         "bbbb"
     ],
+    "span": 6
+}'
+```
+
+- Writer
+```
+$ bazel run //pkg/room -- client --in '{ 
+    "mode": "bench_sender",
+    "id": "bbbb",
+    "credential": "",
+    "host": "127.0.0.1:8081",
+    "permission": [
+        "aaaa"
+    ],
     "span": 6,
+    "frequency": 1,
+    "chunk": 512
 }'
 ```
 

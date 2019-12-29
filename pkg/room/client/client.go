@@ -25,6 +25,8 @@ type input struct {
 	Host       string   `json:"host"`
 	Permission []string `json:"permission"`
 	Span       int      `json:"span"`
+	Frequency  int      `json:"frequency"`
+	Chunk      int      `json:"chunk"`
 }
 
 func Run(jsonin string) {
@@ -130,12 +132,12 @@ func benchSender(in *input) {
 	defer benchTicker.Stop()
 	go func() {
 		for {
-			if err := c.WriteMessage(websocket.BinaryMessage, newRelayMessage(in.Permission, make([]byte, 1024*1024))); err != nil {
+			if err := c.WriteMessage(websocket.BinaryMessage, newRelayMessage(in.Permission, make([]byte, in.Chunk))); err != nil {
 				log.Fatal(err)
 			}
-			writeBytes += 1024 * 1024
-			time.Sleep(45 * time.Millisecond)
-			c.SetWriteDeadline(time.Now().Add(time.Second * 10))
+			writeBytes += in.Chunk
+			time.Sleep(time.Duration(in.Frequency) * time.Millisecond)
+			c.SetWriteDeadline(time.Now().Add(time.Second * 3))
 			fmt.Fprintf(os.Stdout, "\rwrite bytes: %d", writeBytes)
 		}
 	}()
@@ -153,7 +155,7 @@ func benchSender(in *input) {
 		// case <-ticker.C:
 		// 	c.WriteMessage(websocket.TextMessage, []byte(""))
 		case <-benchTicker.C:
-			log.Println("pasted 5 minutes")
+			log.Printf("pasted %d minutes", in.Span)
 			time.Sleep(3 * time.Second)
 			return
 		}

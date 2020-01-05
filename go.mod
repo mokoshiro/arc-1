@@ -12,6 +12,7 @@ require (
 	github.com/k0kubun/pp v3.0.1+incompatible
 	github.com/kr/pretty v0.1.0 // indirect
 	github.com/mattn/go-colorable v0.1.4 // indirect
+	github.com/mmcloughlin/geohash v0.9.0
 	github.com/spf13/cobra v0.0.5
 	github.com/stretchr/testify v1.4.0
 	github.com/ugorji/go v1.1.7 // indirect

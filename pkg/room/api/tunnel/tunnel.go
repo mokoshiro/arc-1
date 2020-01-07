@@ -66,8 +66,8 @@ func (t *Tunnels) Load(key string) (*Tunnel, bool) {
 }
 
 type Tunnel struct {
-	ttype       int // tunnel type 1=peer, 2=coordinator
-	id          string
+	ttype       int    // tunnel type 1=peer, 2=coordinator
+	id          string // Peer ID
 	mu          sync.Mutex
 	ws          *websocket.Conn
 	writeQueue  chan []byte

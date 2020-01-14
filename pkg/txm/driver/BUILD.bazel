@@ -1,0 +1,24 @@
+load("@io_bazel_rules_go//go:def.bzl", "go_library")
+
+go_library(
+    name = "go_default_library",
+    srcs = [
+        "cmd.go",
+        "config.go",
+        "db.go",
+        "driverserver.go",
+        "executorclient.go",
+        "request.go",
+        "response.go",
+    ],
+    importpath = "github.com/Bo0km4n/arc/pkg/txm/driver",
+    visibility = ["//visibility:public"],
+    deps = [
+        "@com_github_garyburd_redigo//redis:go_default_library",
+        "@com_github_gin_gonic_gin//:go_default_library",
+        "@com_github_go_sql_driver_mysql//:go_default_library",
+        "@com_github_patrickmn_go_cache//:go_default_library",
+        "@com_github_spf13_cobra//:go_default_library",
+        "@com_github_spf13_viper//:go_default_library",
+    ],
+)

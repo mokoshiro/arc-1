@@ -1,0 +1,9 @@
+redis:
+    host: "127.0.0.1:12379"
+    maxIdle: 32
+    active: 64
+    idleTimeout: 240
+port: 8000
+cacheExpire: 10
+geoHashAccuracy: 3
+    

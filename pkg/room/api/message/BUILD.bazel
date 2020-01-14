@@ -9,5 +9,4 @@ go_library(
     ],
     importpath = "github.com/Bo0km4n/arc/pkg/room/api/message",
     visibility = ["//visibility:public"],
-    deps = ["@com_github_k0kubun_pp//:go_default_library"],
 )

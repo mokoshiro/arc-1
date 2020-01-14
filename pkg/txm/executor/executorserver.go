@@ -23,9 +23,9 @@ func NewExecutorServer(db *sql.DB) *ExecutorServer {
 	}
 }
 
-func (ds *ExecutorServer) run() {
+func (es *ExecutorServer) run() {
 	app := gin.Default()
-	ds.register(app)
+	es.register(app)
 	srv := &http.Server{
 		Addr:    ":" + executorConf.Port,
 		Handler: app,
@@ -51,10 +51,39 @@ func (ds *ExecutorServer) run() {
 	log.Println("Driver shutdown")
 }
 
-func (ds *ExecutorServer) register(e *gin.Engine) {
-	e.GET("/health", ds.healthCheck)
+func (es *ExecutorServer) register(e *gin.Engine) {
+	e.GET("/health", es.healthCheck)
+	api := e.Group("/api")
+	{
+		api.POST("/peer/prepare", es.PreparePutPeer)
+		api.POST("/peer/commit", es.CommitPutPeer)
+		api.POST("/peer/rollback", es.RollbackPutPeer)
+	}
 }
 
-func (ds *ExecutorServer) healthCheck(c *gin.Context) {
+func (es *ExecutorServer) healthCheck(c *gin.Context) {
 	c.JSON(http.StatusOK, gin.H{"message": "ok"})
+}
+
+func (es *ExecutorServer) PreparePutPeer(c *gin.Context) {
+	req := &PreparePutPeerRequest{}
+	if err := c.BindJSON(req); err != nil {
+		c.JSON(400, gin.H{"message": "invalid json on PreparePutPeer"})
+		return
+	}
+}
+
+func (es *ExecutorServer) CommitPutPeer(c *gin.Context) {
+	req := &CommitPutPeerRequest{}
+	if err := c.BindJSON(req); err != nil {
+		c.JSON(400, gin.H{"message": "invalid json on PreparePutPeer"})
+		return
+	}
+}
+func (es *ExecutorServer) RollbackPutPeer(c *gin.Context) {
+	req := &RollbackPutPeerRequest{}
+	if err := c.BindJSON(req); err != nil {
+		c.JSON(400, gin.H{"message": "invalid json on PreparePutPeer"})
+		return
+	}
 }

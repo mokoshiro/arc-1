@@ -7,6 +7,8 @@ go_library(
         "config.go",
         "db.go",
         "executorserver.go",
+        "request.go",
+        "response.go",
     ],
     importpath = "github.com/Bo0km4n/arc/pkg/txm/executor",
     visibility = ["//visibility:public"],

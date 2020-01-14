@@ -17,7 +17,8 @@ type config struct {
 		MaxIdleConns int
 		MaxOpenConns int
 	}
-	Port string
+	Port        string
+	CacheExpire int
 }
 
 var executorConf = &config{}

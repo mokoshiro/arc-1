@@ -11,15 +11,18 @@ import (
 	"time"
 
 	"github.com/gin-gonic/gin"
+	"github.com/patrickmn/go-cache"
 )
 
 type ExecutorServer struct {
-	db *sql.DB
+	db       *sql.DB
+	putTasks *cache.Cache
 }
 
 func NewExecutorServer(db *sql.DB) *ExecutorServer {
 	return &ExecutorServer{
-		db: db,
+		db:       db,
+		putTasks: cache.New(time.Duration(executorConf.CacheExpire)*time.Minute, time.Duration(executorConf.CacheExpire+5)*time.Minute),
 	}
 }
 

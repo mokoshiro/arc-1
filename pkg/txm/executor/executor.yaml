@@ -7,4 +7,5 @@ mysql:
     maxIdleConns: 256
     maxOpenConns: 256
 port: 8000
+cacheExpire: 60
     

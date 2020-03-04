@@ -3,6 +3,7 @@ package driver
 import (
 	"context"
 	"database/sql"
+	"fmt"
 	"log"
 	"net/http"
 	"os"
@@ -82,6 +83,7 @@ func (ds *DriverServer) register(e *gin.Engine) {
 	{
 		api.POST("/peer", ds.StorePeer)
 		api.PUT("/peer/location", ds.UpdatePeerLocation)
+		api.GET("/peer", ds.ShowPeer)
 	}
 }
 
@@ -175,6 +177,22 @@ func (ds *DriverServer) updatePeerLocation(req *UpdatePeerLocationRequest) error
 	}
 	// Step 6: update pair of <peer : executor> to locationHistory
 	return ds.locationHistory.Put(req.PeerID, executorAddr)
+}
+
+func (ds *DriverServer) ShowPeer(c *gin.Context) {
+	id := c.Query("id")
+	executorAddr, err := ds.locationHistory.Get(id)
+	if err != nil {
+		c.JSON(404, gin.H{"message": fmt.Sprintf("not found peer=%d", id)})
+		return
+	}
+	executorClient := client.NewExecutorClient(ds.httpClient, "http://"+executorAddr)
+	p, err := executorClient.SelectPeer(context.Background(), id)
+	if err != nil {
+		c.JSON(404, gin.H{"message": fmt.Sprintf("not found peer=%d", id)})
+		return
+	}
+	c.JSON(200, p)
 }
 
 func (ds *DriverServer) resolveExecutorAddress(hash string) string {

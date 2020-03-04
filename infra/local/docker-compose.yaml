@@ -1,24 +1,37 @@
 version: '3'
 services:
-  connection-meta:
-    image: "redis:latest"
-    ports:
-      - "6379:6379"
+  # RoomManagerが使用
+  # Roomサーバの地理情報, アドレスを管理
+  room-dns:
+    image: mysql:5.7
+    container_name: room-dns-mysql
+    environment:
+      MYSQL_ROOT_PASSWORD: root
+      MYSQL_DATABASE: test_database
+      MYSQL_USER: docker
+      MYSQL_PASSWORD: docker
+      TZ: 'Asia/Tokyo'
+    command: mysqld --character-set-server=utf8mb4 --collation-server=utf8mb4_unicode_ci
     volumes:
-      - "./data/meta-redis:/data"
-  relay-dns:
+    - ./mysql/my.cnf:/etc/mysql/conf.d/my.cnf
+    - ./mysql/sql:/docker-entrypoint-initdb.d
+    ports:
+    - 3308:3306
+  # Roomサーバ, RoomManager が使用
+  # Roomサーバがどのピアとコネクションを確立しているかの情報を保持
+  connection-dns:
     image: "redis:latest"
     ports:
       - "16379:6379"
-  executor-dns:
-    image: "redis:latest"
-    ports:
-      - "26379:6379"
-  executor-barrel:
+  # Driverが使用
+  # DriverがPeerの情報がどのExecutorに担当されているかの情報を保持
+  location-history: 
     image: "redis:latest"
     ports:
       - "36379:6379"
-  executor-db:
+  # Executorが使用
+  # Peerの地理情報, IPアドレスを保持
+  executor-db: 
     image: mysql:5.7
     container_name: executor-mysql
     environment:
@@ -33,7 +46,9 @@ services:
     - ./mysql/sql:/docker-entrypoint-initdb.d
     ports:
     - 3306:3306
-  executor-dns:
+  # Driverが使用
+  # Executorのメタデータを保持
+  executor-dns: 
     image: mysql:5.7
     container_name: executor-dns-mysql
     environment:

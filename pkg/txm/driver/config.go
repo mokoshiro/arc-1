@@ -8,8 +8,18 @@ import (
 )
 
 type config struct {
+	Mysql struct {
+		Host         string
+		Port         string
+		User         string
+		Password     string
+		Database     string
+		MaxIdleConns int
+		MaxOpenConns int
+		Timeout      int
+	}
 	Redis struct {
-		Host        string
+		Host        string // IP:Port
 		MaxIdle     int
 		Active      int
 		IdleTimeout int

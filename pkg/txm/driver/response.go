@@ -1,6 +1,6 @@
 package driver
 
-type PutResponse struct {
+type RegisterResponse struct {
 	Message string
 }
 

@@ -1,0 +1,13 @@
+syntax = "proto3";
+package proto;
+service Arclet {
+    rpc CreateTracker(Empty) returns (CreateTrackerResponse) {}
+}
+
+message Empty {
+
+}
+
+message CreateTrackerResponse {
+    string port = 1;
+}

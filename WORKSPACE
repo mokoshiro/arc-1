@@ -383,7 +383,7 @@ go_repository(
 
 go_repository(
     name = "org_golang_x_sys",
-    commit = "3ef323f4f1fd",
+    commit = "ecd444e8653b",
     importpath = "golang.org/x/sys",
 )
 
@@ -462,7 +462,7 @@ go_repository(
 go_repository(
     name = "com_github_data_dog_go_sqlmock",
     importpath = "github.com/DATA-DOG/go-sqlmock",
-    tag = "v1.3.3",
+    tag = "v1.4.0",
 )
 
 go_repository(
@@ -708,7 +708,7 @@ go_repository(
 go_repository(
     name = "com_github_volatiletech_sqlboiler",
     importpath = "github.com/volatiletech/sqlboiler",
-    tag = "v3.4.0",
+    tag = "v3.6.1",
 )
 
 go_repository(
@@ -851,7 +851,7 @@ go_repository(
 
 go_repository(
     name = "org_golang_x_xerrors",
-    commit = "1b5146add898",
+    commit = "a985d3407aa7",
     importpath = "golang.org/x/xerrors",
 )
 
@@ -1141,4 +1141,70 @@ go_repository(
     name = "io_etcd_go_bbolt",
     importpath = "go.etcd.io/bbolt",
     tag = "v1.3.2",
+)
+
+go_repository(
+    name = "com_github_friendsofgo_errors",
+    importpath = "github.com/friendsofgo/errors",
+    tag = "v0.9.2",
+)
+
+go_repository(
+    name = "com_github_kat_co_vala",
+    commit = "42e1d8b61f12",
+    importpath = "github.com/kat-co/vala",
+)
+
+go_repository(
+    name = "com_github_docker_distribution",
+    importpath = "github.com/docker/distribution",
+    tag = "v2.7.1",
+)
+
+go_repository(
+    name = "com_github_docker_docker",
+    importpath = "github.com/docker/docker",
+    tag = "v1.13.1",
+)
+
+go_repository(
+    name = "com_github_docker_go_connections",
+    importpath = "github.com/docker/go-connections",
+    tag = "v0.4.0",
+)
+
+go_repository(
+    name = "com_github_docker_go_units",
+    importpath = "github.com/docker/go-units",
+    tag = "v0.4.0",
+)
+
+go_repository(
+    name = "com_github_go_ole_go_ole",
+    importpath = "github.com/go-ole/go-ole",
+    tag = "v1.2.4",
+)
+
+go_repository(
+    name = "com_github_microsoft_go_winio",
+    importpath = "github.com/Microsoft/go-winio",
+    tag = "v0.4.14",
+)
+
+go_repository(
+    name = "com_github_opencontainers_go_digest",
+    importpath = "github.com/opencontainers/go-digest",
+    tag = "v1.0.0-rc1",
+)
+
+go_repository(
+    name = "com_github_shirou_gopsutil",
+    importpath = "github.com/shirou/gopsutil",
+    tag = "v2.20.1",
+)
+
+go_repository(
+    name = "com_github_stackexchange_wmi",
+    commit = "cbe66965904d",
+    importpath = "github.com/StackExchange/wmi",
 )

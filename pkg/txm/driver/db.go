@@ -25,7 +25,7 @@ func mysql(host, port, user, password, database string, maxIdleConns, maxOpenCon
 	return c
 }
 
-func kvs(host string, maxIdle, active, idleTimeout int) *redis.Pool {
+func redisPool(host string, maxIdle, active, idleTimeout int) *redis.Pool {
 	return &redis.Pool{
 		Wait:        true,
 		MaxIdle:     maxIdle,
@@ -33,4 +33,8 @@ func kvs(host string, maxIdle, active, idleTimeout int) *redis.Pool {
 		IdleTimeout: time.Duration(idleTimeout) * time.Second,
 		Dial:        func() (redis.Conn, error) { return redis.Dial("tcp", host) },
 	}
+}
+
+func sqlite(host string, maxIdle, active, idleTimeout int) *sql.DB {
+	return nil
 }

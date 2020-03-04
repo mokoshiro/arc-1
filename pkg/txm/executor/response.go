@@ -1,13 +1,12 @@
 package executor
 
 type PreparePutPeerResponse struct {
-	IdempotencyKey string
 }
 
-type CommitPutPeerResponse struct {
-	IdempotencyKey string
+type UpdatePeerLocationResponse struct {
 }
 
-type RollbackPutPeerResponse struct {
-	IdempotencyKey string
+type ResourceUsageResponse struct {
+	MemUsedPercent float64 `json:"mem_used_percent"`
+	CpuUsedPercent float64 `json:"cpu_used_percent"`
 }

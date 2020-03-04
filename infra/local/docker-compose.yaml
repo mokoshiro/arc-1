@@ -14,9 +14,13 @@ services:
     image: "redis:latest"
     ports:
       - "26379:6379"
-  tracker-db:
+  executor-barrel:
+    image: "redis:latest"
+    ports:
+      - "36379:6379"
+  executor-db:
     image: mysql:5.7
-    container_name: mysql_host
+    container_name: executor-mysql
     environment:
       MYSQL_ROOT_PASSWORD: root
       MYSQL_DATABASE: test_database
@@ -29,4 +33,16 @@ services:
     - ./mysql/sql:/docker-entrypoint-initdb.d
     ports:
     - 3306:3306
+  executor-dns:
+    image: mysql:5.7
+    container_name: executor-dns-mysql
+    environment:
+      MYSQL_ROOT_PASSWORD: root
+      MYSQL_DATABASE: test_database
+      MYSQL_USER: docker
+      MYSQL_PASSWORD: docker
+      TZ: 'Asia/Tokyo'
+    command: mysqld --character-set-server=utf8mb4 --collation-server=utf8mb4_unicode_ci
+    ports:
+    - 3307:3306
       

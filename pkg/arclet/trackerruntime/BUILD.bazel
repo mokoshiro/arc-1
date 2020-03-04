@@ -1,0 +1,29 @@
+load("@io_bazel_rules_go//go:def.bzl", "go_library", "go_test")
+
+go_library(
+    name = "go_default_library",
+    srcs = [
+        "container.go",
+        "db_container.go",
+        "tracker_container.go",
+    ],
+    importpath = "github.com/Bo0km4n/arc/pkg/arclet/trackerruntime",
+    visibility = ["//visibility:public"],
+    deps = [
+        "@com_github_docker_docker//api/types:go_default_library",
+        "@com_github_docker_docker//api/types/container:go_default_library",
+        "@com_github_docker_docker//client:go_default_library",
+        "@com_github_docker_go_connections//nat:go_default_library",
+        "@com_github_gofrs_uuid//:go_default_library",
+    ],
+)
+
+go_test(
+    name = "go_default_test",
+    srcs = ["db_container_test.go"],
+    embed = [":go_default_library"],
+    deps = [
+        "@com_github_docker_docker//api/types:go_default_library",
+        "@com_github_docker_docker//client:go_default_library",
+    ],
+)

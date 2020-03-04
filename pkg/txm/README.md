@@ -12,6 +12,8 @@ Transaction Manager(TXM)
 	* 3.1. [Driver](#Driver-1)
 		* 3.1.1. [Put Information](#PutInformation)
 		* 3.1.2. [Look Up Peer](#LookUpPeer)
+	* 3.2. [Executor](#Executor-1)
+		* 3.2.1. [Prepare put peer request](#Prepareputpeerrequest)
 
 <!-- vscode-markdown-toc-config
 	numbering=true
@@ -60,16 +62,20 @@ Executor DNSは空間インデックスを鍵としてExecutorのアドレスを
 ####  3.1.1. <a name='PutInformation'></a>Put Information
 ピアの登録, 更新を行う.
 
-- PUT: `/api/v1/peer`
-- POST: `/api/v1/peer`
+- PUT: `/api/peer`
+- POST: `/api/peer`
 
 **Request Body**
 ```
-{
-    "peer_id": "aaaa"
+curl -XPOST "http://localhost:8000/api/peer" -d \
+'{
+	"idempotency_key": "aaaa",
+    "peer_id": "aaaa",
+	"addr": "127.0.0.1:8080",
+	"credential": "xxxx",
     "longitude": 127.00000,
     "latitude": 35.0000000
-}
+}'
 ```
 
 ####  3.1.2. <a name='LookUpPeer'></a>Look Up Peer
@@ -87,3 +93,28 @@ Executor DNSは空間インデックスを鍵としてExecutorのアドレスを
 ```
 
 radiusの単位はkm
+
+###  3.2. <a name='Executor-1'></a>Executor
+
+####  3.2.1. <a name='Prepareputpeerrequest'></a>Prepare put peer request
+
+**Request Body**
+```
+curl -XPOST "http://localhost:8000/api/peer/prepare" -d \
+'{
+	"idempotency_key": "xxxx",
+    "peer_id": "aaaa",
+	"addr": "127.0.0.1:8080",
+	"credential": "xxxx",
+    "longitude": 127.00000,
+    "latitude": 35.0000000
+}'
+```
+
+##### Commit put peer request
+```
+curl -XPOST "http://localhost:8000/api/peer/commit" -d \
+'{
+	"idempotency_key": "xxxx"
+}'
+```

@@ -16,6 +16,7 @@ type config struct {
 		Database     string
 		MaxIdleConns int
 		MaxOpenConns int
+		Timeout      int
 	}
 	Port        string
 	CacheExpire int

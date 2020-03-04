@@ -16,13 +16,22 @@ func NewDriverCmd() *cobra.Command {
 		Short: "d",
 		Run: func(cmd *cobra.Command, args []string) {
 			initConfig(driverOption.configFilePath)
-			kvsPool := kvs(
+			sqldb := mysql(
+				driverConf.Mysql.Host,
+				driverConf.Mysql.Port,
+				driverConf.Mysql.User,
+				driverConf.Mysql.Password,
+				driverConf.Mysql.Database,
+				driverConf.Mysql.MaxIdleConns,
+				driverConf.Mysql.MaxOpenConns,
+			)
+			kvs := redisPool(
 				driverConf.Redis.Host,
 				driverConf.Redis.MaxIdle,
 				driverConf.Redis.Active,
 				driverConf.Redis.IdleTimeout,
 			)
-			s := NewDriverServer(kvsPool)
+			s := NewDriverServer(sqldb, kvs)
 			s.run()
 		},
 	}

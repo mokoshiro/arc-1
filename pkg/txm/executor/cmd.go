@@ -6,6 +6,7 @@ import (
 
 type option struct {
 	configFilePath string
+	release        bool
 }
 
 var driverOption = &option{}
@@ -26,6 +27,7 @@ func NewExecutorCmd() *cobra.Command {
 		},
 	}
 
-	cmd.Flags().StringVarP(&driverOption.configFilePath, "config", "c", "./driver/config.yaml", "config file path")
+	cmd.Flags().StringVarP(&driverOption.configFilePath, "config", "c", "./executor", "config file path")
+	cmd.Flags().BoolVarP(&driverOption.release, "release", "r", false, "release mode")
 	return cmd
 }

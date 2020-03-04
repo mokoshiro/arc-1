@@ -2,6 +2,7 @@ package driver
 
 import (
 	"context"
+	"database/sql"
 	"log"
 	"net/http"
 	"os"
@@ -9,34 +10,35 @@ import (
 	"syscall"
 	"time"
 
+	"github.com/Bo0km4n/arc/pkg/txm/executor"
+	"github.com/Bo0km4n/arc/pkg/txm/executor/client"
 	"github.com/garyburd/redigo/redis"
 	"github.com/gin-gonic/gin"
 )
 
 type DriverServer struct {
-	geoHashAccuracy  int
+	geoHashAccuracy  uint
 	geoHashMaxRadius float32
-	executorDNS      *redis.Pool
-	executorClients  *executorClients
+	executorDNS      *executorDNSClient
+	locationHistory  *locationHistory
+	httpClient       *http.Client
 }
 
-func NewDriverServer(kvs *redis.Pool) *DriverServer {
-	return &DriverServer{
-		geoHashAccuracy:  driverConf.GeoHashAccuracy,
-		geoHashMaxRadius: getMaxRadius(driverConf.GeoHashAccuracy),
-		executorDNS:      kvs,
-		executorClients:  nil,
+func NewDriverServer(db *sql.DB, kvs *redis.Pool) *DriverServer {
+	tr := &http.Transport{
+		MaxIdleConns:       512,
+		MaxConnsPerHost:    256,
+		IdleConnTimeout:    30 * time.Second,
+		DisableCompression: true,
 	}
-}
-
-var accRadius = map[int]float32{ // km
-	1: 4989.60000,
-	2: 1012.50000,
-	3: 155.92500,
-	4: 31.64062,
-	5: 4872.66,
-	6: 0.98877,
-	7: 0.15227,
+	httpclient := &http.Client{Transport: tr}
+	return &DriverServer{
+		httpClient:       httpclient,
+		geoHashAccuracy:  uint(driverConf.GeoHashAccuracy),
+		geoHashMaxRadius: getMaxRadius(driverConf.GeoHashAccuracy),
+		executorDNS:      newExecutorDNSClient(db),
+		locationHistory:  newLocationHistory(kvs),
+	}
 }
 
 func getMaxRadius(acc int) float32 {
@@ -76,8 +78,106 @@ func (ds *DriverServer) run() {
 
 func (ds *DriverServer) register(e *gin.Engine) {
 	e.GET("/health", ds.healthCheck)
+	api := e.Group("/api")
+	{
+		api.POST("/peer", ds.StorePeer)
+		api.PUT("/peer/location", ds.UpdatePeerLocation)
+	}
 }
 
 func (ds *DriverServer) healthCheck(c *gin.Context) {
 	c.JSON(http.StatusOK, gin.H{"message": "ok"})
+}
+
+func (ds *DriverServer) StorePeer(c *gin.Context) {
+	req := &RegisterRequest{}
+	if err := c.BindJSON(req); err != nil {
+		c.JSON(400, gin.H{"message": err.Error()})
+		logger.Error(err.Error())
+		return
+	}
+	if err := ds.storePeer(req); err != nil {
+		c.JSON(500, gin.H{"message": err.Error()})
+		logger.Error(err.Error())
+		return
+	}
+}
+
+func (ds *DriverServer) UpdatePeerLocation(c *gin.Context) {
+	req := &UpdatePeerLocationRequest{}
+	if err := c.BindJSON(req); err != nil {
+		c.JSON(400, gin.H{"message": err.Error()})
+		logger.Error(err.Error())
+		return
+	}
+	if err := ds.updatePeerLocation(req); err != nil {
+		c.JSON(500, gin.H{"message": err.Error()})
+		logger.Error(err.Error())
+		return
+	}
+}
+
+func (ds *DriverServer) storePeer(req *RegisterRequest) error {
+	// Step 1: parse target geohash
+	hash := encodeGeoHash(req.Latitude, req.Longitude, ds.geoHashAccuracy)
+	// Step 2: get executor host address by geohash
+	executorAddr := ds.resolveExecutorAddress(hash)
+	// Step 3: send request to store peer information
+	executorClient := client.NewExecutorClient(ds.httpClient, "http://"+executorAddr)
+	ctx := context.Background()
+	storePeerRequest := &executor.PreparePutPeerRequest{
+		PeerID:     req.PeerID,
+		Addr:       req.Addr,
+		Credential: "dummy-credential",
+		Longitude:  req.Longitude,
+		Latitude:   req.Latitude,
+	}
+	if _, err := executorClient.StorePeer(ctx, storePeerRequest); err != nil {
+		return err
+	}
+	// Step 4: store pair of <peer : executor> to locationHistory
+	return ds.locationHistory.Put(req.PeerID, executorAddr)
+}
+
+func (ds *DriverServer) updatePeerLocation(req *UpdatePeerLocationRequest) error {
+	// Step 1: send request to get prev peer information
+	ctx := context.Background()
+	ctx, cancel := context.WithTimeout(ctx, 1*time.Second)
+	defer cancel()
+	prevExecutorAddr, err := ds.locationHistory.Get(req.PeerID)
+	if err != nil {
+		return err
+	}
+	prevc := client.NewExecutorClient(ds.httpClient, "http://"+prevExecutorAddr)
+	prevPeerRow, err := prevc.SelectPeer(ctx, req.PeerID)
+	if err != nil {
+		return err
+	}
+	// Step 2: delete prev peer informatio
+	if _, err := prevc.DeletePeer(ctx, &executor.DeletePeerRequest{PeerID: req.PeerID}); err != nil {
+		return err
+	}
+	// Step 3: parse target geohash
+	hash := encodeGeoHash(req.Latitude, req.Longitude, ds.geoHashAccuracy)
+	// Step 4: get executor host by geohash
+	executorAddr := ds.resolveExecutorAddress(hash)
+	// Step 5: send update request to executor
+	executorClient := client.NewExecutorClient(ds.httpClient, "http://"+executorAddr)
+	execReq := &executor.UpdatePeerRequest{
+		PeerID:     prevPeerRow.PeerID,
+		Longitude:  req.Longitude,
+		Latitude:   req.Latitude,
+		Credential: prevPeerRow.Credential,
+		Addr:       prevPeerRow.Addr,
+	}
+	if _, err := executorClient.UpdatePeerLocation(ctx, execReq); err != nil {
+		return err
+	}
+	// Step 6: update pair of <peer : executor> to locationHistory
+	return ds.locationHistory.Put(req.PeerID, executorAddr)
+}
+
+func (ds *DriverServer) resolveExecutorAddress(hash string) string {
+	// TODO: Implement
+	return "127.0.0.1:8000"
 }

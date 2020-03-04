@@ -6,3 +6,4 @@ infra/local/data/
 /bazel-out
 /bazel-testlogs
 /vendor
+bin/

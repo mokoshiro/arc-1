@@ -7,3 +7,4 @@ infra/local/data/
 /bazel-testlogs
 /vendor
 bin/
+.env

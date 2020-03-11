@@ -5,6 +5,7 @@
 - docker, docker-compose
 - bazel
 - Go
+- mysqldef
 
 これらのツールを下記の手順と注意事項に従ってインストールしてください
 
@@ -34,3 +35,9 @@ https://tecadmin.net/install-go-on-macos/
 
 想定環境は `Go ver 1.11以上` です.
 古いGoだと Go modulesの機能がなく, library周りをインポートできない可能性があります
+
+### mysqldef
+mysqlのマイグレーションにはmysqldefを用いてsqlを適用していきます
+下記のサイトを参考にインストールしてください
+
+https://github.com/k0kubun/sqldef

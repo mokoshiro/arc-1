@@ -2,6 +2,7 @@ package driver
 
 import (
 	"log"
+	"os"
 	"path/filepath"
 
 	"github.com/spf13/viper"
@@ -32,13 +33,17 @@ type config struct {
 var driverConf = &config{}
 
 func initConfig(path string) {
-	viper.SetConfigName("driver")
 	viper.SetConfigType("yaml")
 	filepath, _ := filepath.Abs(path)
+	f, err := os.Open(filepath)
+	if err != nil {
+		logger.Fatal(err)
+	}
+	defer f.Close()
 	viper.AddConfigPath(filepath)
 	viper.AutomaticEnv()
 
-	if err := viper.ReadInConfig(); err != nil {
+	if err := viper.ReadConfig(f); err != nil {
 		log.Fatal(err)
 	}
 	if err := viper.Unmarshal(driverConf); err != nil {

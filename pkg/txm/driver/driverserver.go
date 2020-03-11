@@ -84,6 +84,7 @@ func (ds *DriverServer) register(e *gin.Engine) {
 		api.POST("/peer", ds.StorePeer)
 		api.PUT("/peer/location", ds.UpdatePeerLocation)
 		api.GET("/peer", ds.ShowPeer)
+		api.GET("/peer/lookup", ds.LookupPeer)
 	}
 }
 
@@ -193,6 +194,26 @@ func (ds *DriverServer) ShowPeer(c *gin.Context) {
 		return
 	}
 	c.JSON(200, p)
+}
+
+func (ds *DriverServer) LookupPeer(c *gin.Context) {
+	req := &LookupRequest{}
+	if err := c.BindJSON(req); err != nil {
+		c.JSON(400, gin.H{"message": err.Error()})
+		logger.Error(err.Error())
+		return
+	}
+	res, err := ds.lookupPeer(req)
+	if err != nil {
+		c.JSON(404, gin.H{"message": err.Error()})
+		logger.Error(err.Error())
+		return
+	}
+	c.JSON(200, res)
+}
+
+func (ds *DriverServer) lookupPeer(req *LookupRequest) (*LookupResponse, error) {
+	return nil, nil
 }
 
 func (ds *DriverServer) resolveExecutorAddress(hash string) string {

@@ -29,7 +29,7 @@ func encodeGeoHash(lat float64, lng float64, chars uint) string {
 
 func lookupGeoHashIndexes(lat, lng float64, chars uint, radius float64) []string {
 	roundIndexes := map[string]struct{}{}
-	indexes := make([]string, 360)
+	indexes := make([]string, 0, 360)
 	// Step 1: 円の中心座標を算出
 	centerY, centerX := encodeLatLngToMeter(lat, lng, phi0, lambda)
 	// Step 2: 360度分のGeoHashを重複を除いて算出する

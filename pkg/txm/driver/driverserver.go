@@ -183,13 +183,13 @@ func (ds *DriverServer) ShowPeer(c *gin.Context) {
 	id := c.Query("id")
 	executorAddr, err := ds.locationHistory.Get(id)
 	if err != nil {
-		c.JSON(404, gin.H{"message": fmt.Sprintf("not found peer=%d", id)})
+		c.JSON(404, gin.H{"message": fmt.Sprintf("not found peer=%s", id)})
 		return
 	}
 	executorClient := client.NewExecutorClient(ds.httpClient, "http://"+executorAddr)
 	p, err := executorClient.SelectPeer(context.Background(), id)
 	if err != nil {
-		c.JSON(404, gin.H{"message": fmt.Sprintf("not found peer=%d", id)})
+		c.JSON(404, gin.H{"message": fmt.Sprintf("not found peer=%s", id)})
 		return
 	}
 	c.JSON(200, p)

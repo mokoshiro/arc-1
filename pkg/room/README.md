@@ -1,8 +1,11 @@
 ## Getting Started
 
 **Room Server**
+ルームサーバはP2Pの中継通信を行うサーバです.
+下記のコマンドをプロジェクトルート直下で行ってください
 ```
-$ cd pkg/broker/schema && make init && make import // create database and create table
+$ make local-db-up
+$ make -C pkg/broker/schema init && make -C pkg/broker/schema import // create database and create table
 $ bazel run //pkg/room -- coordinator --redis_host=127.0.0.1:16379 --port 8080 --debug
 ```
 

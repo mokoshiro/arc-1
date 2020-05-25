@@ -5,15 +5,14 @@
 下記のコマンドをプロジェクトルート直下で行ってください
 ```
 $ make local-db-up
-$ make -C pkg/broker/schema init && make -C pkg/broker/schema import // create database and create table
-$ bazel run //pkg/room -- coordinator --redis_host=127.0.0.1:16379 --port 8080 --debug
+$ go run pkg/room/main.go coordinator --redis_host=127.0.0.1:16379 --port 8080 --debug
 ```
 
 **Room Client**
 
 - Reader
 ```
-$ bazel run //pkg/room -- client --in '{ 
+$ go run pkg/room/main.go client --in '{ 
     "mode": "sender",
     "id": "aaaa",
     "credential": "",
@@ -27,7 +26,7 @@ $ bazel run //pkg/room -- client --in '{
 
 - Writer
 ```
-$ bazel run //pkg/room -- client --in '{ 
+$ go run pkg/room/main.go client --in '{ 
     "mode": "bench_sender",
     "id": "bbbb",
     "credential": "",

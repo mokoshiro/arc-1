@@ -25,6 +25,7 @@ type DriverServer struct {
 	httpClient       *http.Client
 }
 
+
 func NewDriverServer(db *sql.DB, kvs *redis.Pool) *DriverServer {
 	tr := &http.Transport{
 		MaxIdleConns:       512,
@@ -80,6 +81,7 @@ func (ds *DriverServer) run() {
 func (ds *DriverServer) register(e *gin.Engine) {
 	e.GET("/health", ds.healthCheck)
 	api := e.Group("/api")
+	//fmt.Println(ds.executorDNS)
 	{
 		api.POST("/peer", ds.StorePeer)
 		api.PUT("/peer/location", ds.UpdatePeerLocation)
@@ -123,8 +125,10 @@ func (ds *DriverServer) UpdatePeerLocation(c *gin.Context) {
 func (ds *DriverServer) storePeer(req *RegisterRequest) error {
 	// Step 1: parse target geohash
 	hash := encodeGeoHash(req.Latitude, req.Longitude, ds.geoHashAccuracy)
+	//fmt.Println(hash)
 	// Step 2: get executor host address by geohash
 	executorAddr := ds.resolveExecutorAddress(hash)
+	fmt.Println(executorAddr)
 	// Step 3: send request to store peer information
 	executorClient := client.NewExecutorClient(ds.httpClient, "http://"+executorAddr)
 	ctx := context.Background()
@@ -139,6 +143,7 @@ func (ds *DriverServer) storePeer(req *RegisterRequest) error {
 		return err
 	}
 	// Step 4: store pair of <peer : executor> to locationHistory
+	//peerを保存するredisの位置を覚えておく
 	return ds.locationHistory.Put(req.PeerID, executorAddr)
 }
 
@@ -218,5 +223,63 @@ func (ds *DriverServer) lookupPeer(req *LookupRequest) (*LookupResponse, error) 
 
 func (ds *DriverServer) resolveExecutorAddress(hash string) string {
 	// TODO: Implement
-	return "127.0.0.1:8000"
+	//fmt.Println(ds.executorDNS)
+	fmt.Println(hash)
+	exists, err := ds.isExistExcutor(hash)
+	if err != nil {
+		log.Fatal(err)
+		return "err"
+	}else if !exists{
+		fmt.Println("not exist")
+		host := ds.newExecutorDNS(1)
+		return ds.putNewHash(host,hash)
+	}else{
+		fmt.Println("exist")
+		//return address
+		var host string
+		query := "SELECT host from executor where  geohash = ?"
+		err:= ds.executorDNS.db.QueryRow(query, hash).Scan(&host)
+		if err != nil{
+			log.Fatal(err)
+		}
+		fmt.Println("host=",host)
+		return host
+	}
+}
+
+func (ds *DriverServer) isExistExcutor(hash string) (bool, error) {
+	var exists bool
+	
+	query := "SELECT exists (SELECT host from executor where  geohash = ?)"
+	fmt.Println(query)
+	err := ds.executorDNS.db.QueryRow(query, hash).Scan(&exists)
+	if err != nil && err != sql.ErrNoRows {
+		return false, err
+	}else{
+	}
+	return exists, nil
+}
+
+func (ds *DriverServer) newExecutorDNS(id int)string{
+	var host string
+		query := "SELECT host from executor where  id = ?"
+		err:= ds.executorDNS.db.QueryRow(query, id).Scan(&host)
+		if err != nil{
+			log.Fatal(err)
+		}
+		fmt.Println("host=",host)
+		return host
+}
+
+func (ds *DriverServer) putNewHash (host string ,hash string) string{
+	statement := fmt.Sprintf("INSERT INTO executor(host,geohash) VALUES (?, ?)")
+	ins, err := ds.executorDNS.db.Prepare(statement)
+	if err != nil{
+		return "err"
+	}
+	_, err = ins.Exec(host,hash)
+	if err != nil {
+		return "err"
+	}
+	return host
 }

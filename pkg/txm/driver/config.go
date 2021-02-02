@@ -29,7 +29,7 @@ type config struct {
 	Port            string
 	GeoHashAccuracy int
 }
-
+ 
 var driverConf = &config{}
 
 func initConfig(path string) {

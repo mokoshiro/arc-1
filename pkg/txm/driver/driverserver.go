@@ -10,6 +10,7 @@ import (
 	"os/signal"
 	"syscall"
 	"time"
+	"math"
 
 	"github.com/Bo0km4n/arc/pkg/txm/executor"
 	"github.com/Bo0km4n/arc/pkg/txm/executor/client"
@@ -127,14 +128,14 @@ func (ds *DriverServer) storePeer(req *RegisterRequest) error {
 	hash := encodeGeoHash(req.Latitude, req.Longitude, ds.geoHashAccuracy)
 	//fmt.Println(hash)
 	// Step 2: get executor host address by geohash
-	executorAddr := ds.resolveExecutorAddress(hash)
+	executorAddr := ds.resolveExecutorAddress(hash,req.Latitude,req.Longitude)
 	fmt.Println(executorAddr)
 	// Step 3: send request to store peer information
 	executorClient := client.NewExecutorClient(ds.httpClient, "http://"+executorAddr)
 	ctx := context.Background()
 	storePeerRequest := &executor.PreparePutPeerRequest{
 		PeerID:     req.PeerID,
-		Addr:       req.Addr,
+		Addr:       req.Addr, //ピアのアドレス
 		Credential: "dummy-credential",
 		Longitude:  req.Longitude,
 		Latitude:   req.Latitude,
@@ -168,7 +169,7 @@ func (ds *DriverServer) updatePeerLocation(req *UpdatePeerLocationRequest) error
 	// Step 3: parse target geohash
 	hash := encodeGeoHash(req.Latitude, req.Longitude, ds.geoHashAccuracy)
 	// Step 4: get executor host by geohash
-	executorAddr := ds.resolveExecutorAddress(hash)
+	executorAddr := ds.resolveExecutorAddress(hash,req.Latitude,req.Longitude)
 	// Step 5: send update request to executor
 	executorClient := client.NewExecutorClient(ds.httpClient, "http://"+executorAddr)
 	execReq := &executor.UpdatePeerRequest{
@@ -217,21 +218,64 @@ func (ds *DriverServer) LookupPeer(c *gin.Context) {
 	c.JSON(200, res)
 }
 
-func (ds *DriverServer) lookupPeer(req *LookupRequest) (*LookupResponse, error) {
-	return nil, nil
+func (ds *DriverServer) lookupPeer(req *LookupRequest) ([]string, error) {
+	var indexs []string
+	var peer []string
+	indexs = lookupGeoHashIndexes(req.Latitude,req.Longitude,3,req.Radius)
+	fmt.Println(indexs)
+	for _,hash := range indexs{
+		exists, err :=ds.isExistExcutor(hash)
+		if err != nil{
+			log.Fatal(err)
+			return nil,err
+		}else if !exists{
+			//not exist
+			fmt.Println(hash," not exist")
+		}else{
+			//executorにリクエストをおくる
+			fmt.Println(hash," exist")
+			addr := ds.getExecutorAddress(hash)
+			executorClient := client.NewExecutorClient(ds.httpClient, "http://"+addr)
+			execReq := &executor.LookupRequest{
+				Radius:     req.Radius,
+				Longitude:  req.Longitude,
+				Latitude:   req.Latitude,
+			}
+			p, err := executorClient.GetPeer(context.Background(), execReq)
+			if err != nil{
+				return nil,err
+			}
+			peer = append(peer,p)
+		}
+	}
+
+	fmt.Println(peer)
+	return peer, nil
 }
 
-func (ds *DriverServer) resolveExecutorAddress(hash string) string {
+func (ds *DriverServer) getExecutorAddress(hash string)string {
+	query := "SELECT host from executor where geohash = ?"
+	var host string
+	err := ds.executorDNS.db.QueryRow(query,hash).Scan(&host)
+	if err != nil{
+		log.Fatal(err)
+	}
+	//fmt.Println(host)
+	return host
+}
+
+func (ds *DriverServer) resolveExecutorAddress(hash string,lng float64,lat float64) string {
 	// TODO: Implement
-	//fmt.Println(ds.executorDNS)
-	fmt.Println(hash)
+	//fmt.Println(hash)
 	exists, err := ds.isExistExcutor(hash)
 	if err != nil {
 		log.Fatal(err)
 		return "err"
 	}else if !exists{
 		fmt.Println("not exist")
-		host := ds.newExecutorDNS(1)
+		//ds.newExecutorDNS(1)
+		host := ds.newExecutorDNS(lng,lat)
+		//host = host + ":" + port
 		return ds.putNewHash(host,hash)
 	}else{
 		fmt.Println("exist")
@@ -251,7 +295,7 @@ func (ds *DriverServer) isExistExcutor(hash string) (bool, error) {
 	var exists bool
 	
 	query := "SELECT exists (SELECT host from executor where  geohash = ?)"
-	fmt.Println(query)
+	//fmt.Println(query)
 	err := ds.executorDNS.db.QueryRow(query, hash).Scan(&exists)
 	if err != nil && err != sql.ErrNoRows {
 		return false, err
@@ -260,26 +304,57 @@ func (ds *DriverServer) isExistExcutor(hash string) (bool, error) {
 	return exists, nil
 }
 
-func (ds *DriverServer) newExecutorDNS(id int)string{
-	var host string
-		query := "SELECT host from executor where  id = ?"
-		err:= ds.executorDNS.db.QueryRow(query, id).Scan(&host)
-		if err != nil{
-			log.Fatal(err)
+func (ds *DriverServer) newExecutorDNS(lng float64,lat float64)string{
+	query := "SELECT host ,longitude ,latitude from executor where  geohash = ?"
+	//用意されたDB
+	geohash := "@"
+	var host []string
+	var distance []float64
+	rows, err := ds.executorDNS.db.Query(query,geohash)
+	if err != nil{
+		log.Fatal(err)
+	}
+	for rows.Next(){
+		type Executor struct{
+			Host string
+			Lng float64
+			Lat float64
 		}
-		fmt.Println("host=",host)
-		return host
+		var executor Executor
+		rows.Scan(&executor.Host,&executor.Lng,&executor.Lat)
+		host = append(host,executor.Host)
+		distance = append(distance,ds.distance(lng,lat,executor.Lng,executor.Lat))
+	}
+	return host[ds.min(distance)]
 }
 
-func (ds *DriverServer) putNewHash (host string ,hash string) string{
+func (ds *DriverServer)putNewHash(host string ,hash string) string{
 	statement := fmt.Sprintf("INSERT INTO executor(host,geohash) VALUES (?, ?)")
 	ins, err := ds.executorDNS.db.Prepare(statement)
 	if err != nil{
+		log.Fatal(err)
 		return "err"
 	}
 	_, err = ins.Exec(host,hash)
 	if err != nil {
+		log.Fatal(err)
 		return "err"
 	}
 	return host
+}
+
+func (ds *DriverServer)distance(lng1 float64,lat1 float64,lng2 float64,lat2 float64) float64{
+	return math.Sqrt((lng1-lng2)*(lng1-lng2)+(lat1-lat2)*(lat1-lat2))
+}
+
+func (ds *DriverServer)min(distance []float64) int {
+	num := 0
+	min := distance[num]
+	for i, _ := range distance {
+		if distance[i] < min{
+			min = distance[i]
+			num = i
+		}
+	}
+	return num
 }

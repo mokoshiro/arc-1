@@ -1,7 +1,7 @@
 package driver
 
 import (
-	"fmt"
+	//"fmt"
 	"math"
 
 	"github.com/mmcloughlin/geohash"
@@ -43,7 +43,8 @@ func lookupGeoHashIndexes(lat, lng float64, chars uint, radius float64) []string
 			indexes = append(indexes, index)
 		}
 	}
-	return indexes[:len(roundIndexes)]
+	indexes = append(indexes,encodeGeoHash(lat,lng,3))
+	return indexes[:len(roundIndexes)+1]
 }
 
 func decodeMeterToLatLng(x, y, phi0Deg, lambda0Deg float64) (float64, float64) {
@@ -159,7 +160,7 @@ func encodeLatLngToMeter(lat, lng float64, phi0, lambda0 float64) (float64, floa
 	lambdaC := math.Cos(lambdaRad - lambda0Rad)
 	lambdaS := math.Sin(lambdaRad - lambda0Rad)
 
-	fmt.Println(lambdaC, lambdaS)
+	//fmt.Println(lambdaC, lambdaS)
 
 	// Step 4: t, t_
 	t := math.Sinh(math.Atanh(math.Sin(phiRad)) - ((2*math.Sqrt(n))/(1+n))*math.Atanh(((2*math.Sqrt(n))/(1+n))*math.Sin(phiRad)))

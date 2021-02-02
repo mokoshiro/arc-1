@@ -39,3 +39,11 @@ type DeletePeerResponse struct{}
 
 type ResourceUsage struct {
 }
+
+type LookupRequest struct {
+	Radius    float64 `json:"radius" binding:"required"`
+	Longitude float64 `json:"longitude" binding:"required"`
+	Latitude  float64 `json:"latitude" binding:"required"`
+}
+
+

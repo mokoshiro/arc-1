@@ -23,6 +23,13 @@ type ExecutorServer struct {
 	updateTasks *cache.Cache
 }
 
+type LookupPeerRequest struct {
+	Longitude  float64 `json:"longitude" binding:"required"`
+	Latitude   float64 `json:"latitude" binding:"required"`
+	Radius     float64 `json:"radius" binding:"required"`
+}
+
+
 func NewExecutorServer(db *sql.DB) *ExecutorServer {
 	return &ExecutorServer{
 		db:          db,
@@ -68,6 +75,7 @@ func (es *ExecutorServer) register(e *gin.Engine) {
 		api.DELETE("/peer", es.DeletePeer)
 		api.GET("/peer", es.ShowPeer)
 		api.GET("/resource", es.ResourceUsage)
+		api.GET("/peer/lookup",es.ReadPeer)
 	}
 }
 
@@ -162,7 +170,7 @@ func (es *ExecutorServer) deletePeer(req *DeletePeerRequest) error {
 	return deletePeerTx(tx, req)
 }
 
-// Get
+// Get ToDo
 func (es *ExecutorServer) ShowPeer(c *gin.Context) {
 	id := c.Query("peer_id")
 	ctx := context.Background()
@@ -203,3 +211,58 @@ func (es *ExecutorServer) ResourceUsage(c *gin.Context) {
 	}
 	c.JSON(200, resp)
 }
+
+func (es *ExecutorServer) ReadPeer(c *gin.Context){
+	req := &LookupPeerRequest{}
+
+	if err := c.BindJSON(req); err != nil{
+		log.Fatal(err)
+		c.JSON(400,gin.H{"message": "invalid json of ReadPeer"})
+		return
+	}
+	if err := es.readPeer(c,req); err != nil{
+		log.Fatal(err)
+		c.JSON(500,gin.H{"message": "Failed read peer information"})
+	}
+	//c.JSON(200,gin.H{"message": "read complete"})
+}
+
+func (es *ExecutorServer) readPeer(c *gin.Context, req *LookupPeerRequest) error{
+	rows, err := es.db.Query("SELECT peer_id,ST_X(location),ST_Y(location) from peer")
+	if err != nil{
+		return err
+	}
+	defer rows.Close()
+	 loc  := ""
+	for rows.Next(){
+		var lng float64
+		var lat float64
+		var  peer string
+		err := rows.Scan(&peer,&lng,&lat)
+		//fmt.Println(lng,lat)
+		if err != nil{
+			return err
+		}
+		if es.LookupPeer(es.db,req,lng,lat){
+			loc = loc + peer
+			fmt.Println(peer)
+		}
+	}
+	c.JSON(200,gin.H{"peer": loc})
+	return nil
+}
+	
+	func (es *ExecutorServer)LookupPeer(db *sql.DB, req *LookupPeerRequest,lng float64,lat float64) bool{
+		query := "SELECT peer_id FROM peer WHERE ST_Within(ST_GeomFromText(?),ST_Buffer(POINT(?,?),?))"
+		pointValue1 := fmt.Sprintf(`POINT(%f %f)`,lng,lat)
+		radius := 0.009/1000*req.Radius
+		var peer string
+		err := db.QueryRow(query,pointValue1,req.Longitude,req.Latitude,radius).Scan(&peer)
+		if err == sql.ErrNoRows{
+			return false
+		}else if err !=nil{
+			log.Fatal(err)
+			return false
+		}
+		return true
+	}
